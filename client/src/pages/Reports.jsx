@@ -103,6 +103,18 @@ export function Reports() {
         }
     };
 
+    const handleQuickUpdateStatus = async (reportId, targetStatus) => {
+        try {
+            const report = allReports.find(r => r.id === reportId);
+            await api.updateReportStatus(reportId, targetStatus, report?.admin_response || '');
+            const label = targetStatus === 'baru' ? 'Baru' : targetStatus === 'diproses' ? 'Sedang Diproses' : 'Selesai';
+            addToast(`Status laporan berhasil diubah menjadi "${label}".`, 'success');
+            await loadReports();
+        } catch (err) {
+            addToast(err.message || 'Gagal mengubah status laporan.', 'error');
+        }
+    };
+
     const formatDateTime = (dateStr) => {
         try {
             const date = new Date(dateStr);
@@ -348,7 +360,40 @@ export function Reports() {
                                                     {r.description}
                                                 </div>
                                             </td>
-                                            <td>{getStatusBadge(r.status)}</td>
+                                            <td>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                                    <div>{getStatusBadge(r.status)}</div>
+                                                    <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap' }}>
+                                                        <button
+                                                            type="button"
+                                                            className={`btn btn-sm ${r.status === 'baru' ? 'btn-primary' : 'btn-ghost'}`}
+                                                            style={{ fontSize: '0.688rem', padding: '2px 6px', height: 'auto', lineHeight: '1.2' }}
+                                                            onClick={() => handleQuickUpdateStatus(r.id, 'baru')}
+                                                            title="Ubah status laporan ke Baru"
+                                                        >
+                                                            Baru
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className={`btn btn-sm ${r.status === 'diproses' ? 'btn-primary' : 'btn-ghost'}`}
+                                                            style={{ fontSize: '0.688rem', padding: '2px 6px', height: 'auto', lineHeight: '1.2' }}
+                                                            onClick={() => handleQuickUpdateStatus(r.id, 'diproses')}
+                                                            title="Ubah status laporan ke Sedang Diproses"
+                                                        >
+                                                            Proses
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className={`btn btn-sm ${r.status === 'selesai' ? 'btn-primary' : 'btn-ghost'}`}
+                                                            style={{ fontSize: '0.688rem', padding: '2px 6px', height: 'auto', lineHeight: '1.2' }}
+                                                            onClick={() => handleQuickUpdateStatus(r.id, 'selesai')}
+                                                            title="Ubah status laporan ke Selesai / Teratasi"
+                                                        >
+                                                            Selesai
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </td>
                                             <td style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                                                 {formatDateTime(r.created_at)}
                                             </td>
@@ -357,6 +402,7 @@ export function Reports() {
                                                     type="button"
                                                     className="btn btn-secondary btn-sm"
                                                     onClick={() => handleOpenRespond(r)}
+                                                    title="Tulis tanggapan atau catatan admin"
                                                 >
                                                     <EditIcon size={14} /> Tanggapi
                                                 </button>
@@ -401,7 +447,7 @@ export function Reports() {
                         >
                             <option value="baru">Baru (Belum Ditinjau Admin)</option>
                             <option value="diproses">Sedang Diproses (Sudah Dibaca & Sedang Dikerjakan)</option>
-                            <option value="selesai">Selesai (Sudah Ditangani & Tuntas)</option>
+                            <option value="selesai">Sudah Selesai / Teratasi</option>
                         </select>
                     </div>
 

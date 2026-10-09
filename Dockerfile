@@ -21,10 +21,8 @@ COPY . .
 # Bangun bundle frontend produksi
 RUN npm run build --prefix client
 
-# Konfigurasi port (Port default Hugging Face Spaces adalah 7860)
-ENV PORT=7860
+# Konfigurasi environment produksi
 ENV NODE_ENV=production
-EXPOSE 7860
 
 # Jalankan server
 CMD ["npm", "start"]

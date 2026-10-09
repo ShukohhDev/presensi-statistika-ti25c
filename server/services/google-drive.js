@@ -211,6 +211,45 @@ async function testDriveConnection() {
     }
 }
 
-module.exports = { uploadToDrive, testDriveConnection, DEFAULT_FOLDER_ID, DEFAULT_FOLDER_URL };
+async function deleteFromDrive(fileId) {
+    if (!fileId) return false;
+    try {
+        let authClient = null;
+        if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
+            const clientId = process.env.GOOGLE_CLIENT_ID.trim().replace(/^["']|["']$/g, '');
+            const clientSecret = process.env.GOOGLE_CLIENT_SECRET.trim().replace(/^["']|["']$/g, '');
+            const refreshToken = process.env.GOOGLE_REFRESH_TOKEN.trim().replace(/^["']|["']$/g, '');
+            const oauth2Client = new google.auth.OAuth2(
+                clientId,
+                clientSecret,
+                'https://developers.google.com/oauthplayground'
+            );
+            oauth2Client.setCredentials({ refresh_token: refreshToken });
+            authClient = oauth2Client;
+        } else if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+            let jsonStr = process.env.GOOGLE_SERVICE_ACCOUNT_JSON.trim();
+            if ((jsonStr.startsWith("'") && jsonStr.endsWith("'")) || (jsonStr.startsWith('"') && jsonStr.endsWith('"') && !jsonStr.startsWith('{"'))) {
+                jsonStr = jsonStr.slice(1, -1);
+            }
+            const credentials = typeof jsonStr === 'object' ? jsonStr : JSON.parse(jsonStr);
+            const jwtClient = google.auth.fromJSON(credentials);
+            jwtClient.scopes = ['https://www.googleapis.com/auth/drive'];
+            authClient = jwtClient;
+        }
+
+        if (!authClient) return false;
+        const drive = google.drive({ version: 'v3', auth: authClient });
+        await drive.files.delete({
+            fileId,
+            supportsAllDrives: true
+        });
+        return true;
+    } catch (err) {
+        console.warn('[Google Drive] Gagal menghapus file dari drive:', err.message);
+        return false;
+    }
+}
+
+module.exports = { uploadToDrive, deleteFromDrive, testDriveConnection, DEFAULT_FOLDER_ID, DEFAULT_FOLDER_URL };
 
 

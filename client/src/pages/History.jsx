@@ -1,14 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../utils/api';
+import { useToast } from '../contexts/ToastContext';
 import {
     ClockIcon,
     FileTextIcon,
     CheckCircleIcon,
     RefreshIcon,
-    HistoryIcon
+    HistoryIcon,
+    TrashIcon
 } from '../components/Common/Icons';
 
 export function History() {
+    const { addToast } = useToast();
     const [activeTab, setActiveTab] = useState('attendance'); // 'attendance', 'tasks', 'activity'
     const [attendanceList, setAttendanceList] = useState([]);
     const [taskList, setTaskList] = useState([]);
@@ -60,6 +63,20 @@ export function History() {
         const sizes = ['B', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+    };
+
+    const handleDeleteTask = async (id, title) => {
+        if (!window.confirm(`Hapus berkas tugas "${title}"? Tindakan ini tidak dapat dibatalkan.`)) {
+            return;
+        }
+
+        try {
+            await api.deleteTask(id);
+            addToast('Berkas tugas berhasil dihapus.', 'success');
+            await loadData();
+        } catch (err) {
+            addToast(err.message || 'Gagal menghapus berkas tugas.', 'error');
+        }
     };
 
     return (
@@ -187,6 +204,7 @@ export function History() {
                                         <th>Ukuran</th>
                                         <th>Tanggal Pengumpulan</th>
                                         <th>Waktu Masuk</th>
+                                        <th style={{ textAlign: 'center', width: '80px' }}>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -202,6 +220,17 @@ export function History() {
                                             <td>{t.submitted_date}</td>
                                             <td style={{ fontSize: '0.813rem', color: 'var(--color-text-muted)' }}>
                                                 {formatDateTime(t.submitted_at)}
+                                            </td>
+                                            <td style={{ textAlign: 'center' }}>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-ghost btn-sm"
+                                                    onClick={() => handleDeleteTask(t.id, t.task_title || t.file_name)}
+                                                    style={{ color: 'var(--color-danger)', padding: '4px 8px', fontSize: '0.75rem' }}
+                                                    title="Hapus berkas tugas ini"
+                                                >
+                                                    <TrashIcon size={14} /> Hapus
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}

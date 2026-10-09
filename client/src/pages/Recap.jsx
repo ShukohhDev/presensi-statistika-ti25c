@@ -84,18 +84,27 @@ export function Recap() {
         };
     };
 
-    // Filter data based on search query and UAS status
-    const filteredRecap = recapData.filter((item) => {
-        const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase().trim());
-        const uas = getUASStatus(item.percentage || 0);
-        let matchesStatus = true;
-        if (statusFilter === 'aman') matchesStatus = uas.type === 'aman';
-        else if (statusFilter === 'waspada') matchesStatus = uas.type === 'waspada';
-        else if (statusFilter === 'kritis') matchesStatus = uas.type === 'kritis';
-        return matchesSearch && matchesStatus;
-    });
+    const isAdmin = user?.role === 'admin';
 
-    // Counts for stats
+    // Filter data based on role: Mahasiswa HANYA melihat data miliknya sendiri
+    const displayedRecap = isAdmin
+        ? recapData.filter((item) => {
+            const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase().trim());
+            const uas = getUASStatus(item.percentage || 0);
+            let matchesStatus = true;
+            if (statusFilter === 'aman') matchesStatus = uas.type === 'aman';
+            else if (statusFilter === 'waspada') matchesStatus = uas.type === 'waspada';
+            else if (statusFilter === 'kritis') matchesStatus = uas.type === 'kritis';
+            return matchesSearch && matchesStatus;
+        })
+        : recapData.filter((item) => {
+            // Strict privacy: hanya akun pemilik
+            if (user?.id && item.id === user.id) return true;
+            if (user?.name && item.name.trim().toLowerCase() === user.name.trim().toLowerCase()) return true;
+            return false;
+        });
+
+    // Counts for stats (Admin view)
     const totalAman = recapData.filter(i => (i.percentage || 0) >= 55).length;
     const totalWaspada = recapData.filter(i => (i.percentage || 0) >= 40 && (i.percentage || 0) < 55).length;
     const totalKritis = recapData.filter(i => (i.percentage || 0) < 40).length;
@@ -124,8 +133,9 @@ export function Recap() {
         }
     };
 
-    const isAdmin = user?.role === 'admin';
-    const studentItem = !isAdmin && recapData.length > 0 ? recapData[0] : null;
+    const studentItem = !isAdmin && displayedRecap.length > 0
+        ? displayedRecap[0]
+        : (!isAdmin && recapData.length === 1 ? recapData[0] : null);
 
     return (
         <div>
@@ -351,7 +361,7 @@ export function Recap() {
                 <div className="text-center text-muted" style={{ padding: '48px 0' }}>
                     Memuat data rekapitulasi...
                 </div>
-            ) : filteredRecap.length === 0 ? (
+            ) : displayedRecap.length === 0 ? (
                 <div className="card empty-state" style={{ padding: '48px 16px' }}>
                     <BarChartIcon size={48} />
                     <h3>Tidak Ada Data Mahasiswa Sesuai Filter</h3>
@@ -374,7 +384,7 @@ export function Recap() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredRecap.map((item, index) => {
+                            {displayedRecap.map((item, index) => {
                                 const uas = getUASStatus(item.percentage || 0);
                                 return (
                                     <tr key={item.id}>
@@ -429,7 +439,7 @@ export function Recap() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredRecap.map((item, index) => {
+                            {displayedRecap.map((item, index) => {
                                 const uas = getUASStatus(item.percentage || 0);
                                 return (
                                     <tr key={item.id}>

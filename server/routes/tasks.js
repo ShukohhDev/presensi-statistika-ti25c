@@ -6,7 +6,7 @@ const { getDb } = require('../config/database');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const { uploadTask } = require('../middleware/upload');
 
-const { uploadToDrive, testDriveConnection, DEFAULT_FOLDER_URL } = require('../services/google-drive');
+const { uploadToDrive, deleteFromDrive, testDriveConnection, DEFAULT_FOLDER_URL } = require('../services/google-drive');
 
 // GET /api/tasks/test-drive - Uji status koneksi Google Drive
 router.get('/test-drive', authenticateToken, async (req, res) => {
@@ -44,6 +44,13 @@ router.delete('/:id', authenticateToken, async (req, res) => {
                     console.warn('Gagal menghapus berkas lokal:', unlinkErr.message);
                 }
             }
+        }
+
+        // Hapus file dari Google Drive jika ada id
+        if (task.google_drive_id) {
+            deleteFromDrive(task.google_drive_id).catch(err => {
+                console.warn('Gagal menghapus berkas dari Google Drive:', err.message);
+            });
         }
 
         // Hapus dari database

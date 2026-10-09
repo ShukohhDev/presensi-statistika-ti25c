@@ -94,6 +94,49 @@ router.post('/create', authenticateToken, requireAdmin, uploadMaterial.single('f
     }
 });
 
+// PUT /api/materials/:id - Edit materi perkuliahan (admin only)
+router.put('/:id', authenticateToken, requireAdmin, (req, res) => {
+    try {
+        const { meeting_number, title, description, external_link, category } = req.body;
+        const db = getDb();
+
+        const material = db.prepare('SELECT * FROM materials WHERE id = ?').get(req.params.id);
+        if (!material) {
+            return res.status(404).json({ error: 'Materi tidak ditemukan.' });
+        }
+
+        if (!title || !title.trim()) {
+            return res.status(400).json({ error: 'Judul materi wajib diisi.' });
+        }
+
+        const meetingNum = parseInt(meeting_number, 10) || material.meeting_number;
+        const cat = category === 'dataset' ? 'dataset' : 'slide';
+
+        db.prepare(`
+            UPDATE materials
+            SET meeting_number = ?, title = ?, description = ?, external_link = ?, category = ?
+            WHERE id = ?
+        `).run(
+            meetingNum,
+            title.trim(),
+            description ? description.trim() : null,
+            external_link ? external_link.trim() : null,
+            cat,
+            req.params.id
+        );
+
+        // Log aktivitas
+        db.prepare(
+            'INSERT INTO activity_log (user_id, action, description) VALUES (?, ?, ?)'
+        ).run(req.user.id, 'edit_materi', `Memperbarui materi pertemuan ${meetingNum}: ${title.trim()}`);
+
+        res.json({ message: 'Materi perkuliahan berhasil diperbarui.' });
+    } catch (err) {
+        console.error('Update material error:', err);
+        res.status(500).json({ error: 'Terjadi kesalahan server.' });
+    }
+});
+
 // DELETE /api/materials/:id - Hapus materi perkuliahan (admin only)
 router.delete('/:id', authenticateToken, requireAdmin, (req, res) => {
     try {

@@ -228,6 +228,11 @@ export const api = {
             method: 'POST',
             body: formData,
         }),
+    updateMaterial: (id, data) =>
+        request(`/api/materials/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
     deleteMaterial: (id) =>
         request(`/api/materials/${id}`, { method: 'DELETE' }),
 };

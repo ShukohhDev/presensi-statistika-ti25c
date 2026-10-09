@@ -10,6 +10,7 @@ import {
     ExternalLinkIcon,
     PlusIcon,
     TrashIcon,
+    EditIcon,
     XIcon,
     SearchIcon,
     RefreshIcon,
@@ -28,7 +29,7 @@ export function Materials() {
     const [activeCategory, setActiveCategory] = useState('slide'); // 'slide' or 'dataset'
     const [pjPhone, setPjPhone] = useState('');
 
-    // Modal state for Admin
+    // Modal state for Admin (Upload)
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [meetingNumber, setMeetingNumber] = useState(1);
     const [category, setCategory] = useState('slide'); // 'slide' or 'dataset'
@@ -37,6 +38,16 @@ export function Materials() {
     const [externalLink, setExternalLink] = useState('');
     const [materialFile, setMaterialFile] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Modal state for Admin (Edit)
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [editMeetingNumber, setEditMeetingNumber] = useState(1);
+    const [editCategory, setEditCategory] = useState('slide');
+    const [editTitle, setEditTitle] = useState('');
+    const [editDescription, setEditDescription] = useState('');
+    const [editExternalLink, setEditExternalLink] = useState('');
+    const [isSavingEdit, setIsSavingEdit] = useState(false);
 
     const loadMaterials = useCallback(async () => {
         try {
@@ -144,6 +155,42 @@ Pertanyaan saya: `;
             await loadMaterials();
         } catch (err) {
             addToast(err.message || 'Gagal menghapus materi.', 'error');
+        }
+    };
+
+    const handleOpenEdit = (m) => {
+        setEditingId(m.id);
+        setEditTitle(m.title || '');
+        setEditDescription(m.description || '');
+        setEditMeetingNumber(m.meeting_number || 1);
+        setEditCategory(m.category || 'slide');
+        setEditExternalLink(m.external_link || '');
+        setShowEditModal(true);
+    };
+
+    const handleSaveEdit = async (e) => {
+        e.preventDefault();
+        if (!editTitle.trim()) {
+            addToast('Judul materi wajib diisi.', 'error');
+            return;
+        }
+
+        try {
+            setIsSavingEdit(true);
+            await api.updateMaterial(editingId, {
+                meeting_number: editMeetingNumber,
+                category: editCategory,
+                title: editTitle.trim(),
+                description: editDescription.trim(),
+                external_link: editExternalLink.trim()
+            });
+            addToast('Materi perkuliahan berhasil diperbarui.', 'success');
+            setShowEditModal(false);
+            await loadMaterials();
+        } catch (err) {
+            addToast(err.message || 'Gagal memperbarui materi.', 'error');
+        } finally {
+            setIsSavingEdit(false);
         }
     };
 
@@ -291,15 +338,26 @@ Pertanyaan saya: `;
                                         Pertemuan ke-{m.meeting_number} {m.category === 'dataset' ? '- Dataset' : ''}
                                     </span>
                                     {user?.role === 'admin' && (
-                                        <button
-                                            type="button"
-                                            className="btn btn-ghost btn-sm"
-                                            onClick={() => handleDeleteMaterial(m.id, m.title)}
-                                            style={{ color: 'var(--color-danger)', padding: '4px' }}
-                                            title="Hapus materi ini"
-                                        >
-                                            <TrashIcon size={16} />
-                                        </button>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <button
+                                                type="button"
+                                                className="btn btn-ghost btn-sm"
+                                                onClick={() => handleOpenEdit(m)}
+                                                style={{ color: 'var(--color-primary)', padding: '4px' }}
+                                                title="Edit materi ini"
+                                            >
+                                                <EditIcon size={16} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="btn btn-ghost btn-sm"
+                                                onClick={() => handleDeleteMaterial(m.id, m.title)}
+                                                style={{ color: 'var(--color-danger)', padding: '4px' }}
+                                                title="Hapus materi ini"
+                                            >
+                                                <TrashIcon size={16} />
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
 
@@ -530,6 +588,118 @@ Pertanyaan saya: `;
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? 'Menyimpan...' : 'Unggah Materi'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Edit Materi (Admin) */}
+            {showEditModal && (
+                <div className="modal-backdrop" onClick={() => setShowEditModal(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '560px' }}>
+                        <div className="modal-header">
+                            <h3>Edit Materi Perkuliahan</h3>
+                            <button
+                                type="button"
+                                className="modal-close"
+                                onClick={() => setShowEditModal(false)}
+                            >
+                                <XIcon size={18} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSaveEdit} style={{ padding: '20px' }}>
+                            <div className="form-group">
+                                <label className="form-label" htmlFor="editMatCategorySelect">
+                                    Kategori Berkas <span style={{ color: 'var(--color-danger)' }}>*</span>
+                                </label>
+                                <select
+                                    id="editMatCategorySelect"
+                                    className="form-input"
+                                    value={editCategory}
+                                    onChange={(e) => setEditCategory(e.target.value)}
+                                    required
+                                >
+                                    <option value="slide">Slide & Modul Kuliah (Teori)</option>
+                                    <option value="dataset">Bank Dataset & Bahan Praktikum (CSV/Excel/SPSS)</option>
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label" htmlFor="editMatMeetingNumber">
+                                    Pertemuan Perkuliahan <span style={{ color: 'var(--color-danger)' }}>*</span>
+                                </label>
+                                <select
+                                    id="editMatMeetingNumber"
+                                    className="form-input"
+                                    value={editMeetingNumber}
+                                    onChange={(e) => setEditMeetingNumber(Number(e.target.value))}
+                                    required
+                                >
+                                    {Array.from({ length: 16 }, (_, i) => i + 1).map(num => (
+                                        <option key={num} value={num}>Pertemuan {num}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label" htmlFor="editMatTitle">
+                                    Judul / Topik Materi <span style={{ color: 'var(--color-danger)' }}>*</span>
+                                </label>
+                                <input
+                                    id="editMatTitle"
+                                    type="text"
+                                    className="form-input"
+                                    value={editTitle}
+                                    onChange={(e) => setEditTitle(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label" htmlFor="editMatDescription">
+                                    Deskripsi Singkat / Catatan Dosen
+                                </label>
+                                <textarea
+                                    id="editMatDescription"
+                                    className="form-textarea"
+                                    rows={3}
+                                    value={editDescription}
+                                    onChange={(e) => setEditDescription(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label" htmlFor="editMatExternalLink">
+                                    Tautan Google Drive / Repository Materi
+                                </label>
+                                <input
+                                    id="editMatExternalLink"
+                                    type="url"
+                                    className="form-input"
+                                    value={editExternalLink}
+                                    onChange={(e) => setEditExternalLink(e.target.value)}
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '10px', marginTop: '24px' }}>
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    style={{ flex: 1 }}
+                                    onClick={() => setShowEditModal(false)}
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary"
+                                    style={{ flex: 1 }}
+                                    disabled={isSavingEdit}
+                                >
+                                    {isSavingEdit ? 'Menyimpan Perubahan...' : 'Simpan Perubahan'}
                                 </button>
                             </div>
                         </form>
