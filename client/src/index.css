@@ -1284,6 +1284,21 @@ input:focus, textarea:focus, select:focus {
   margin-top: var(--space-xs);
 }
 
+/* ---- Course Meta Grid ---- */
+.course-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 480px) {
+  .course-meta-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
 /* ---- Attendance Card ---- */
 .attendance-panel {
   background-color: var(--color-bg-card);
@@ -1836,59 +1851,325 @@ input:focus, textarea:focus, select:focus {
   color: var(--color-text-muted);
 }
 
-/* ---- Responsive ---- */
+/* ---- Optimasi Mobile & Sistem Responsif Komprehensif ---- */
 @media (max-width: 768px) {
+  /* Layout & Spacing */
   .main-content {
-    padding: var(--space-md);
-    padding-top: 80px;
+    padding: 12px 10px;
+    padding-top: 68px;
+    min-height: calc(100vh - 68px);
   }
 
+  .content-wrapper {
+    padding-top: 68px;
+  }
+
+  /* Header & Navbar */
+  .navbar {
+    height: 58px;
+    padding: 0 12px;
+  }
+
+  .navbar-brand h1 {
+    font-size: 0.938rem;
+    letter-spacing: -0.01em;
+  }
+
+  .navbar-brand span {
+    font-size: 0.688rem;
+    padding: 2px 6px;
+  }
+
+  .navbar-actions {
+    gap: 4px;
+  }
+
+  .navbar-icon-btn,
+  .hamburger-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  /* Page Header */
+  .page-header {
+    margin-bottom: 14px;
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+
+  .page-subtitle {
+    font-size: 0.813rem;
+  }
+
+  /* Cards & Containers */
+  .card {
+    padding: 14px 12px;
+    border-radius: var(--radius-md);
+    margin-bottom: 14px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .card-header > div:last-child {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .card-header .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  /* Statistik Grid */
   .stat-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
   }
 
-  .login-card {
-    padding: var(--space-lg);
+  .stat-card {
+    padding: 12px;
+    border-radius: var(--radius-md);
   }
 
-  .modal {
-    padding: var(--space-lg);
-    margin: var(--space-md);
+  .stat-card-title {
+    font-size: 0.688rem;
+  }
+
+  .stat-card-value {
+    font-size: 1.25rem;
+  }
+
+  /* Form & Input Anti-Zoom Bug di Mobile Safari/Chrome */
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  .form-label {
+    font-size: 0.813rem;
+    margin-bottom: 4px;
+  }
+
+  .form-input,
+  .form-textarea,
+  .form-select {
+    font-size: 16px !important; /* Mencegah auto zoom-in pada HP */
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+  }
+
+  .form-textarea {
+    min-height: 80px;
+  }
+
+  /* Tombol Nyaman Disentuh (Touch-Friendly Targets) */
+  .btn {
+    min-height: 42px;
+    padding: 8px 14px;
+    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+    touch-action: manipulation;
+  }
+
+  .btn-sm {
+    min-height: 38px;
+    padding: 6px 12px;
+    font-size: 0.813rem;
+  }
+
+  /* Panel Presensi */
+  .attendance-panel {
+    padding: 14px 12px;
+    border-radius: var(--radius-md);
+    max-width: 100%;
+  }
+
+  .attendance-subject {
+    padding: 12px;
+    border-radius: var(--radius-md);
+  }
+
+  .attendance-subject h3 {
+    font-size: 0.938rem;
+  }
+
+  .attendance-options {
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .attendance-option {
+    padding: 12px;
+    min-height: 50px;
+    border-radius: var(--radius-md);
+  }
+
+  /* Tabel dengan Scroll Horizontal Halus */
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+    margin-bottom: 8px;
+  }
+
+  .table {
+    min-width: 520px; /* Menjaga agar kolom tidak terjepit */
   }
 
   .table th,
   .table td {
-    padding: 8px 12px;
+    padding: 10px 12px;
     font-size: 0.75rem;
+    white-space: nowrap;
   }
 
+  /* Tabs Navigasi Horizontal */
+  .tabs {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    white-space: nowrap;
+    gap: 4px;
+    margin-bottom: 14px;
+    padding-bottom: 4px;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    flex-shrink: 0;
+    min-height: 40px;
+    padding: 8px 14px;
+    font-size: 0.813rem;
+  }
+
+  /* Dialog Modal di Layar HP */
+  .modal-backdrop {
+    padding: 8px;
+    align-items: flex-end; /* Memposisikan seperti bottom sheet */
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 16px 14px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 90vh;
+  }
+
+  .modal-header {
+    margin-bottom: 14px;
+  }
+
+  .modal-title {
+    font-size: 1rem;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 10px;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Sidebar Mobile */
+  .sidebar {
+    width: min(290px, 85vw);
+    padding: 14px;
+    padding-top: 68px;
+  }
+
+  .sidebar-item {
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 0.938rem;
+  }
+
+  /* Panel Notifikasi */
   .notification-panel {
     width: 100%;
     right: -100%;
+    top: 58px;
+    height: calc(100vh - 58px);
   }
 
+  /* Halaman Login */
+  .login-container {
+    padding: 12px;
+  }
+
+  .login-card {
+    padding: 24px 16px;
+    border-radius: var(--radius-lg);
+  }
+
+  .login-header h1 {
+    font-size: 1.35rem;
+  }
+
+  /* Toast Notifikasi */
+  .toast-container {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    max-width: none;
+    width: auto;
+  }
+
+  .toast {
+    width: 100%;
+    font-size: 0.813rem;
+  }
+
+  /* Theme Grid */
   .theme-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 }
 
 @media (max-width: 480px) {
   .stat-grid {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
 
   .navbar-brand h1 {
-    font-size: 0.938rem;
+    font-size: 0.875rem;
+  }
+
+  .navbar-brand span {
+    display: none; /* Sembunyikan badge peran pada layar sangat kecil agar tidak bertumpuk */
   }
 
   .page-title {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
   }
-}
 
-/* ---- Content wrapper with navbar offset ---- */
-.content-wrapper {
-  padding-top: 80px;
+  .theme-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---- Utility Classes ---- */

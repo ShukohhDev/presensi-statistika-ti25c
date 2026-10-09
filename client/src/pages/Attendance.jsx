@@ -220,12 +220,7 @@ export function Attendance() {
                     )}
                 </div>
 
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-                    gap: '14px',
-                    fontSize: '0.875rem'
-                }}>
+                <div className="course-meta-grid">
                     <div style={{ padding: '12px 14px', background: 'var(--color-bg-hover)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
                         <div style={{ fontSize: '0.688rem', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             Dosen Pengampu
