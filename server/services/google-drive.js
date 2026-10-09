@@ -18,7 +18,15 @@ async function uploadToDrive(filePath, fileName, mimeType) {
     let authClient = null;
 
     try {
-        if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+        if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
+            const oauth2Client = new google.auth.OAuth2(
+                process.env.GOOGLE_CLIENT_ID,
+                process.env.GOOGLE_CLIENT_SECRET,
+                'https://developers.google.com/oauthplayground'
+            );
+            oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+            authClient = oauth2Client;
+        } else if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
             let jsonStr = process.env.GOOGLE_SERVICE_ACCOUNT_JSON.trim();
             if ((jsonStr.startsWith("'") && jsonStr.endsWith("'")) || (jsonStr.startsWith('"') && jsonStr.endsWith('"') && !jsonStr.startsWith('{"'))) {
                 jsonStr = jsonStr.slice(1, -1);
@@ -39,14 +47,6 @@ async function uploadToDrive(filePath, fileName, mimeType) {
                 key: privateKey,
                 scopes: ['https://www.googleapis.com/auth/drive'],
             });
-        } else if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
-            const oauth2Client = new google.auth.OAuth2(
-                process.env.GOOGLE_CLIENT_ID,
-                process.env.GOOGLE_CLIENT_SECRET,
-                'https://developers.google.com/oauthplayground'
-            );
-            oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
-            authClient = oauth2Client;
         }
 
         if (!authClient) {
@@ -108,17 +108,25 @@ async function uploadToDrive(filePath, fileName, mimeType) {
 async function testDriveConnection() {
     const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID || DEFAULT_FOLDER_ID;
     
-    if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON && !process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE && !process.env.GOOGLE_CLIENT_ID) {
+    if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON && !process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE && !process.env.GOOGLE_REFRESH_TOKEN) {
         return {
             success: false,
-            message: 'Variabel GOOGLE_SERVICE_ACCOUNT_JSON belum disetel di server.',
+            message: 'Variabel kredensial Google Drive (OAuth atau Service Account) belum disetel di server.',
             folderId
         };
     }
 
     try {
         let authClient = null;
-        if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+        if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
+            const oauth2Client = new google.auth.OAuth2(
+                process.env.GOOGLE_CLIENT_ID,
+                process.env.GOOGLE_CLIENT_SECRET,
+                'https://developers.google.com/oauthplayground'
+            );
+            oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+            authClient = oauth2Client;
+        } else if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
             let jsonStr = process.env.GOOGLE_SERVICE_ACCOUNT_JSON.trim();
             if ((jsonStr.startsWith("'") && jsonStr.endsWith("'")) || (jsonStr.startsWith('"') && jsonStr.endsWith('"') && !jsonStr.startsWith('{"'))) {
                 jsonStr = jsonStr.slice(1, -1);
