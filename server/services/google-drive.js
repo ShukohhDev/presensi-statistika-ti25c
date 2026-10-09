@@ -12,7 +12,36 @@ const DEFAULT_FOLDER_URL = 'https://drive.google.com/drive/folders/1gzYtiqFXn6ly
  * 3. Service Account Key via file path (GOOGLE_SERVICE_ACCOUNT_KEY_FILE)
  * 4. OAuth2 (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN)
  */
-async function uploadToDrive(filePath, fileName, mimeType) {
+async function getOrCreateFolder(drive, parentFolderId, folderName) {
+    if (!parentFolderId || !folderName) return parentFolderId;
+    const sanitizedName = folderName.replace(/'/g, "\\'");
+    const q = `'${parentFolderId}' in parents and name = '${sanitizedName}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
+    const res = await drive.files.list({
+        q,
+        fields: 'files(id, name)',
+        spaces: 'drive',
+        supportsAllDrives: true,
+        includeItemsFromAllDrives: true
+    });
+
+    if (res.data.files && res.data.files.length > 0) {
+        return res.data.files[0].id;
+    }
+
+    const createRes = await drive.files.create({
+        requestBody: {
+            name: folderName,
+            mimeType: 'application/vnd.google-apps.folder',
+            parents: [parentFolderId]
+        },
+        fields: 'id, name',
+        supportsAllDrives: true
+    });
+
+    return createRes.data.id;
+}
+
+async function uploadToDrive(filePath, fileName, mimeType, studentName = null, submissionDate = null) {
     const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID || DEFAULT_FOLDER_ID;
 
     let authClient = null;
@@ -64,9 +93,26 @@ async function uploadToDrive(filePath, fileName, mimeType) {
 
         const drive = google.drive({ version: 'v3', auth: authClient });
 
+        let targetFolderId = folderId;
+
+        // Kelompokkan file ke folder Nama Mahasiswa > Tanggal Pengumpulan jika tersedia
+        if (targetFolderId && studentName && studentName.trim()) {
+            try {
+                const studentFolderId = await getOrCreateFolder(drive, targetFolderId, studentName.trim());
+                if (submissionDate && submissionDate.trim()) {
+                    targetFolderId = await getOrCreateFolder(drive, studentFolderId, submissionDate.trim());
+                } else {
+                    targetFolderId = studentFolderId;
+                }
+            } catch (folderErr) {
+                console.warn('[Google Drive] Gagal membuat subfolder berjenjang, kembali ke folder utama:', folderErr.message);
+                targetFolderId = folderId;
+            }
+        }
+
         const fileMetadata = {
             name: fileName,
-            parents: folderId ? [folderId] : undefined,
+            parents: targetFolderId ? [targetFolderId] : undefined,
         };
 
         const media = {
@@ -74,7 +120,7 @@ async function uploadToDrive(filePath, fileName, mimeType) {
             body: fs.createReadStream(filePath),
         };
 
-        console.log(`[Google Drive] Mengunggah "${fileName}" ke folder ${folderId}...`);
+        console.log(`[Google Drive] Mengunggah "${fileName}" ke folder ${targetFolderId}...`);
 
         const response = await drive.files.create({
             requestBody: fileMetadata,

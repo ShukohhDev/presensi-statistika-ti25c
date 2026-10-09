@@ -81,7 +81,7 @@ export function Reports() {
 
     const handleOpenRespond = (report) => {
         setSelectedReport(report);
-        setNewStatus(report.status || 'proses');
+        setNewStatus(report.status === 'proses' ? 'diproses' : (report.status || 'diproses'));
         setAdminResponse(report.admin_response || '');
         setRespondModalOpen(true);
     };
@@ -121,11 +121,12 @@ export function Reports() {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'baru':
-                return <span className="badge-status badge-baru">Baru</span>;
+                return <span className="badge-status badge-baru">Baru (Belum Ditinjau)</span>;
+            case 'diproses':
             case 'proses':
-                return <span className="badge-status badge-diproses">Diproses</span>;
+                return <span className="badge-status badge-diproses">Sedang Diproses</span>;
             case 'selesai':
-                return <span className="badge-status badge-selesai">Selesai</span>;
+                return <span className="badge-status badge-selesai">Selesai Ditangani</span>;
             default:
                 return <span className="badge-status">{status}</span>;
         }
@@ -398,9 +399,9 @@ export function Reports() {
                             value={newStatus}
                             onChange={(e) => setNewStatus(e.target.value)}
                         >
-                            <option value="baru">Baru</option>
-                            <option value="proses">Sedang Diproses</option>
-                            <option value="selesai">Selesai Ditangani</option>
+                            <option value="baru">Baru (Belum Ditinjau Admin)</option>
+                            <option value="diproses">Sedang Diproses (Sudah Dibaca & Sedang Dikerjakan)</option>
+                            <option value="selesai">Selesai (Sudah Ditangani & Tuntas)</option>
                         </select>
                     </div>
 

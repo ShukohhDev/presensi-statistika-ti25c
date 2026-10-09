@@ -27,6 +27,8 @@ export function AdminDashboard() {
     // Form open session
     const [meetingNumber, setMeetingNumber] = useState(1);
     const [sessionTitle, setSessionTitle] = useState('');
+    const [durationHours, setDurationHours] = useState(0);
+    const [durationMins, setDurationMins] = useState(15);
     const [durationMinutes, setDurationMinutes] = useState(15);
     const [openingSession, setOpeningSession] = useState(false);
 
@@ -165,12 +167,18 @@ export function AdminDashboard() {
 
     const handleOpenSession = async (e) => {
         e.preventDefault();
+        const totalDuration = (parseInt(durationHours, 10) * 60) + parseInt(durationMins, 10);
+        if (totalDuration < 5) {
+            addToast('Durasi minimal sesi adalah 5 menit.', 'error');
+            return;
+        }
+
         try {
             setOpeningSession(true);
             const res = await api.openSession(
                 parseInt(meetingNumber, 10),
                 sessionTitle.trim() || `Pertemuan ${meetingNumber}`,
-                parseInt(durationMinutes, 10)
+                totalDuration
             );
             addToast(res.message || 'Sesi presensi berhasil dibuka.', 'success');
             setSessionTitle('');
@@ -573,19 +581,75 @@ Shukoh#Dev (PJ MK Statistika Kelas TI25C)`;
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label" htmlFor="durationMinutes">
-                                    Durasi Sesi Presensi (Menit)
-                                </label>
-                                <input
-                                    id="durationMinutes"
-                                    type="number"
-                                    min="5"
-                                    max="180"
-                                    className="form-input"
-                                    value={durationMinutes}
-                                    onChange={(e) => setDurationMinutes(e.target.value)}
-                                    required
-                                />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                    <label className="form-label" style={{ margin: 0 }}>
+                                        Durasi Sesi Presensi
+                                    </label>
+                                    <span className="badge-status badge-hadir" style={{ fontSize: '0.75rem', fontWeight: 600 }}>
+                                        Total: {(durationHours * 60) + durationMins} Menit {durationHours > 0 ? `(${durationHours} jam ${durationMins} mnt)` : ''}
+                                    </span>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <div>
+                                        <label htmlFor="durationHoursSelect" style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginBottom: '4px', display: 'block' }}>
+                                            Jam
+                                        </label>
+                                        <select
+                                            id="durationHoursSelect"
+                                            className="form-select"
+                                            value={durationHours}
+                                            onChange={(e) => setDurationHours(Number(e.target.value))}
+                                        >
+                                            {[0, 1, 2, 3, 4, 5].map((h) => (
+                                                <option key={h} value={h}>{h} Jam</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="durationMinsSelect" style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginBottom: '4px', display: 'block' }}>
+                                            Menit
+                                        </label>
+                                        <select
+                                            id="durationMinsSelect"
+                                            className="form-select"
+                                            value={durationMins}
+                                            onChange={(e) => setDurationMins(Number(e.target.value))}
+                                        >
+                                            {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map((m) => (
+                                                <option key={m} value={m}>{m} Menit</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Tombol Pintas Durasi (Preset Cepat) */}
+                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px' }}>
+                                    {[
+                                        { label: '15 Menit', h: 0, m: 15 },
+                                        { label: '30 Menit', h: 0, m: 30 },
+                                        { label: '45 Menit', h: 0, m: 45 },
+                                        { label: '1 Jam', h: 1, m: 0 },
+                                        { label: '1 Jam 30m', h: 1, m: 30 },
+                                        { label: '2 Jam', h: 2, m: 0 }
+                                    ].map((preset) => {
+                                        const isSelected = durationHours === preset.h && durationMins === preset.m;
+                                        return (
+                                            <button
+                                                key={preset.label}
+                                                type="button"
+                                                className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-secondary'}`}
+                                                onClick={() => {
+                                                    setDurationHours(preset.h);
+                                                    setDurationMins(preset.m);
+                                                }}
+                                                style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                                            >
+                                                {preset.label}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
 
                             <button

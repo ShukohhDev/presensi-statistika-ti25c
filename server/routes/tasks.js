@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
 const { getDb } = require('../config/database');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const { uploadTask } = require('../middleware/upload');
@@ -13,6 +15,49 @@ router.get('/test-drive', authenticateToken, async (req, res) => {
         res.json(result);
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// DELETE /api/tasks/:id - Hapus berkas tugas (mahasiswa pemilik atau admin)
+router.delete('/:id', authenticateToken, async (req, res) => {
+    try {
+        const taskId = req.params.id;
+        const db = getDb();
+
+        const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId);
+        if (!task) {
+            return res.status(404).json({ error: 'Data tugas tidak ditemukan.' });
+        }
+
+        // Hanya pemilik tugas atau admin yang boleh menghapus
+        if (req.user.role !== 'admin' && task.user_id !== req.user.id) {
+            return res.status(403).json({ error: 'Akses ditolak. Anda hanya dapat menghapus berkas tugas milik sendiri.' });
+        }
+
+        // Hapus file fisik lokal jika ada
+        if (task.file_path) {
+            const fullLocalPath = path.join(__dirname, '..', task.file_path);
+            if (fs.existsSync(fullLocalPath)) {
+                try {
+                    fs.unlinkSync(fullLocalPath);
+                } catch (unlinkErr) {
+                    console.warn('Gagal menghapus berkas lokal:', unlinkErr.message);
+                }
+            }
+        }
+
+        // Hapus dari database
+        db.prepare('DELETE FROM tasks WHERE id = ?').run(taskId);
+
+        // Log aktivitas
+        db.prepare(
+            'INSERT INTO activity_log (user_id, action, description) VALUES (?, ?, ?)'
+        ).run(req.user.id, 'hapus_tugas', `Menghapus berkas tugas: ${task.file_name} (${task.task_title})`);
+
+        res.json({ message: 'Berkas tugas berhasil dihapus.' });
+    } catch (err) {
+        console.error('Delete task error:', err);
+        res.status(500).json({ error: 'Terjadi kesalahan server.' });
     }
 });
 
@@ -45,7 +90,9 @@ router.post('/upload', authenticateToken, uploadTask.single('file'), async (req,
             const driveResult = await uploadToDrive(
                 req.file.path,
                 `${req.user.name}_${req.file.originalname}`,
-                req.file.mimetype
+                req.file.mimetype,
+                req.user.name,
+                submitted_date
             );
 
             if (driveResult.googleDriveId) {

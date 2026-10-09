@@ -127,7 +127,9 @@ router.get('/summary', authenticateToken, (req, res) => {
 router.get('/recap', authenticateToken, (req, res) => {
     try {
         const db = getDb();
-        const users = db.prepare("SELECT id, name FROM users WHERE role = 'user' ORDER BY name").all();
+        const users = req.user.role === 'admin'
+            ? db.prepare("SELECT id, name FROM users WHERE role = 'user' ORDER BY name").all()
+            : db.prepare("SELECT id, name FROM users WHERE id = ?").all(req.user.id);
         const sessions = db.prepare('SELECT * FROM sessions ORDER BY meeting_number ASC').all();
 
         const recap = users.map(user => {

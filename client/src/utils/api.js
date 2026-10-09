@@ -148,6 +148,8 @@ export const api = {
         request('/api/tasks/history'),
     getAllTasks: () =>
         request('/api/tasks/all'),
+    deleteTask: (id) =>
+        request(`/api/tasks/${id}`, { method: 'DELETE' }),
     testDriveConnection: () =>
         request('/api/tasks/test-drive'),
 

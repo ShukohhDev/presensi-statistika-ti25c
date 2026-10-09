@@ -59,6 +59,24 @@ function migrate() {
         db.prepare("ALTER TABLE course_info ADD COLUMN pj_whatsapp_phone TEXT DEFAULT ''").run();
     } catch (e) {}
 
+    try {
+        db.prepare("ALTER TABLE calendar_events ADD COLUMN room TEXT DEFAULT ''").run();
+    } catch (e) {}
+
+    try {
+        db.prepare("ALTER TABLE calendar_events ADD COLUMN building TEXT DEFAULT ''").run();
+    } catch (e) {}
+
+    try {
+        db.prepare(`
+            UPDATE materials 
+            SET title = 'Slide & Modul Pertemuan 1 - Pengantar Statistika dan Probabilitas',
+                description = 'Materi pengantar konsep dasar statistika deskriptif, populasi & sampel, skala pengukuran, dan penyajian data.',
+                external_link = 'https://drive.google.com/drive/folders/1gzYtiqFXn6lyyr4sDQa6jfXsb7qBHq9L'
+            WHERE external_link LIKE '%sample-slide-kalkulus2%' OR id = 1
+        `).run();
+    } catch (e) {}
+
     console.log('Database migration completed successfully.');
 }
 

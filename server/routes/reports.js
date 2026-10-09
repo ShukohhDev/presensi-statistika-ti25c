@@ -82,14 +82,22 @@ router.put('/update-status', authenticateToken, requireAdmin, (req, res) => {
         const { report_id, status, admin_response } = req.body;
         const db = getDb();
 
+        let normStatus = status === 'proses' ? 'diproses' : status;
+        if (!['baru', 'diproses', 'selesai'].includes(normStatus)) {
+            normStatus = 'diproses';
+        }
+
         db.prepare(
             'UPDATE reports SET status = ?, admin_response = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-        ).run(status, admin_response || null, report_id);
+        ).run(normStatus, admin_response || null, report_id);
 
         // Notifikasi ke user pembuat laporan
         const report = db.prepare('SELECT * FROM reports WHERE id = ?').get(report_id);
         if (report) {
-            const statusText = status === 'diproses' ? 'sedang diproses' : 'selesai diproses';
+            let statusText = 'sedang diproses oleh PJ MK';
+            if (normStatus === 'baru') statusText = 'telah ditinjau kembali';
+            if (normStatus === 'selesai') statusText = 'telah selesai ditangani';
+
             db.prepare(
                 `INSERT INTO notifications (user_id, title, message, type, created_by) VALUES (?, ?, ?, ?, ?)`
             ).run(

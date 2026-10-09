@@ -1838,13 +1838,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 .calendar-cell.has-event::after {
-  content: '';
-  width: 4px;
-  height: 4px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-primary);
-  position: absolute;
-  bottom: 4px;
+  display: none;
 }
 
 .calendar-cell.other-month {

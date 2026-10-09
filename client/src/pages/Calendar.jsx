@@ -31,7 +31,9 @@ export function Calendar() {
     const [eventDate, setEventDate] = useState('');
     const [eventTime, setEventTime] = useState('08:00');
     const [eventType, setEventType] = useState('kuliah'); // 'kuliah', 'tugas', 'ujian', 'libur'
-    const [eventLocation, setEventLocation] = useState('Ruang Kuliah / Daring');
+    const [eventRoom, setEventRoom] = useState('');
+    const [eventBuilding, setEventBuilding] = useState('');
+    const [eventLocation, setEventLocation] = useState('');
     const [savingEvent, setSavingEvent] = useState(false);
 
     const year = currentDate.getFullYear();
@@ -91,6 +93,10 @@ export function Calendar() {
         setEventDate(defaultDate);
         setEventTitle('');
         setEventDescription('');
+        setEventRoom('');
+        setEventBuilding('');
+        setEventLocation('');
+        setEventType('kuliah');
         setAddModalOpen(true);
     };
 
@@ -109,9 +115,11 @@ export function Calendar() {
                 event_date: eventDate,
                 event_time: eventTime,
                 event_type: eventType,
+                room: eventRoom.trim(),
+                building: eventBuilding.trim(),
                 location: eventLocation.trim()
             });
-            addToast('Agenda berhasil ditambahkan.', 'success');
+            addToast('Agenda berhasil ditambahkan dan diumumkan ke mahasiswa.', 'success');
             setAddModalOpen(false);
             await loadEvents();
         } catch (err) {
@@ -121,7 +129,11 @@ export function Calendar() {
         }
     };
 
-    const handleDeleteEvent = async (id) => {
+    const handleDeleteEvent = async (id, isAssignment) => {
+        if (isAssignment) {
+            addToast('Batas tugas dikelola melalui menu Pengumpulan Tugas.', 'warning');
+            return;
+        }
         if (!window.confirm('Hapus agenda ini?')) return;
         try {
             await api.deleteCalendarEvent(id);
@@ -142,6 +154,21 @@ export function Calendar() {
             today.getMonth() === currentDate.getMonth() &&
             today.getFullYear() === year
         );
+    };
+
+    const renderEventTypeBadge = (type) => {
+        switch (type) {
+            case 'kuliah':
+                return <span className="badge-status badge-hadir">Kelas Kuliah</span>;
+            case 'tugas':
+                return <span className="badge-status badge-izin">Tugas Kuliah</span>;
+            case 'ujian':
+                return <span className="badge-status badge-alpha">Quiz / Ujian</span>;
+            case 'libur':
+                return <span className="badge-status badge-sakit">Hari Libur</span>;
+            default:
+                return <span className="badge-status">{type}</span>;
+        }
     };
 
     return (
@@ -213,18 +240,56 @@ export function Calendar() {
                             const today = isToday(day);
                             const isSelected = selectedDateStr === `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
+                            const hasKuliah = dayEvents.some(e => e.event_type === 'kuliah');
+                            const hasTugas = dayEvents.some(e => e.event_type === 'tugas');
+                            const hasQuiz = dayEvents.some(e => e.event_type === 'ujian');
+                            const hasLibur = dayEvents.some(e => e.event_type === 'libur');
+
                             return (
                                 <button
                                     key={`day-${day}`}
                                     type="button"
                                     className={`calendar-cell ${today ? 'today' : ''} ${hasEvent ? 'has-event' : ''}`}
-                                    style={isSelected && !today ? { border: '2px solid var(--color-primary)' } : {}}
+                                    style={{
+                                        position: 'relative',
+                                        padding: '4px',
+                                        minHeight: '44px',
+                                        ...(isSelected && !today ? { border: '2px solid var(--color-primary)' } : {})
+                                    }}
                                     onClick={() => handleSelectDay(day)}
                                 >
-                                    <span>{day}</span>
+                                    <span style={{ fontWeight: today ? 700 : 500 }}>{day}</span>
+                                    {hasEvent && (
+                                        <div style={{ display: 'flex', gap: '3px', marginTop: '3px', alignItems: 'center', justifyContent: 'center' }}>
+                                            {hasKuliah && <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#2563EB' }} title="Ada Kuliah" />}
+                                            {hasTugas && <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#D97706' }} title="Ada Batas Tugas" />}
+                                            {hasQuiz && <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#DC2626' }} title="Ada Quiz / Ujian" />}
+                                            {hasLibur && <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981' }} title="Hari Libur" />}
+                                        </div>
+                                    )}
                                 </button>
                             );
                         })}
+                    </div>
+
+                    {/* Petunjuk Indikator Warna */}
+                    <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)', fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#2563EB', display: 'inline-block' }} />
+                            <span>Kelas Kuliah</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#D97706', display: 'inline-block' }} />
+                            <span>Pengumpulan Tugas</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#DC2626', display: 'inline-block' }} />
+                            <span>Quiz / Ujian</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }} />
+                            <span>Hari Libur</span>
+                        </div>
                     </div>
                 </div>
 
@@ -261,18 +326,16 @@ export function Calendar() {
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                             <div>
-                                                <span className="badge-status badge-hadir" style={{ textTransform: 'capitalize' }}>
-                                                    {evt.event_type}
-                                                </span>
+                                                {renderEventTypeBadge(evt.event_type)}
                                                 <h3 style={{ fontSize: '1rem', fontWeight: 600, marginTop: '4px', color: 'var(--color-text)' }}>
                                                     {evt.title}
                                                 </h3>
                                             </div>
-                                            {user?.role === 'admin' && (
+                                            {user?.role === 'admin' && !evt.is_assignment && (
                                                 <button
                                                     type="button"
                                                     className="modal-close"
-                                                    onClick={() => handleDeleteEvent(evt.id)}
+                                                    onClick={() => handleDeleteEvent(evt.id, evt.is_assignment)}
                                                     title="Hapus Agenda"
                                                 >
                                                     <TrashIcon size={16} />
@@ -280,14 +343,24 @@ export function Calendar() {
                                             )}
                                         </div>
 
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '8px' }}>
-                                            <ClockIcon size={14} />
-                                            <span>Waktu: {evt.event_time || '08:00 WIB'}</span>
-                                            {evt.location && <span>- Lokasi: {evt.location}</span>}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '8px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <ClockIcon size={14} />
+                                                <span>{evt.event_time || '08:00 WIB'}</span>
+                                            </div>
+                                            {evt.room && evt.room !== '-' && (
+                                                <span>Ruang: <strong>{evt.room}</strong></span>
+                                            )}
+                                            {evt.building && evt.building !== '-' && (
+                                                <span>Gedung: <strong>{evt.building}</strong></span>
+                                            )}
+                                            {evt.location && (!evt.room || evt.room === '-') && (
+                                                <span>Lokasi: {evt.location}</span>
+                                            )}
                                         </div>
 
                                         {evt.description && (
-                                            <p style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)', marginTop: '6px' }}>
+                                            <p style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)', marginTop: '6px', lineHeight: 1.5 }}>
                                                 {evt.description}
                                             </p>
                                         )}
@@ -322,12 +395,13 @@ export function Calendar() {
                                                 {evt.title}
                                             </h3>
                                         </div>
-                                        <span className="badge-status badge-hadir" style={{ textTransform: 'capitalize' }}>
-                                            {evt.event_type}
-                                        </span>
+                                        {renderEventTypeBadge(evt.event_type)}
                                     </div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-                                        {evt.event_time} {evt.location ? `- ${evt.location}` : ''}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '6px' }}>
+                                        <span>{evt.event_time || '08:00 WIB'}</span>
+                                        {evt.room && evt.room !== '-' && <span>Ruang: <strong>{evt.room}</strong></span>}
+                                        {evt.building && evt.building !== '-' && <span>Gedung: <strong>{evt.building}</strong></span>}
+                                        {evt.location && (!evt.room || evt.room === '-') && <span>Lokasi: {evt.location}</span>}
                                     </div>
                                 </div>
                             ))}
@@ -340,7 +414,7 @@ export function Calendar() {
             <Modal
                 isOpen={addModalOpen}
                 onClose={() => setAddModalOpen(false)}
-                title="Tambah Agenda Kalender Baru"
+                title="Tambah Pengingat Agenda / Kelas / Quiz Baru"
             >
                 <form onSubmit={handleSaveEvent}>
                     <div className="form-group">
@@ -351,7 +425,7 @@ export function Calendar() {
                             id="eventTitleInput"
                             type="text"
                             className="form-input"
-                            placeholder="Contoh: Kuliah Pertemuan 4 - Integral Lipat"
+                            placeholder="Contoh: Kuliah Pertemuan 5 - Analisis Regresi / Quiz 1"
                             value={eventTitle}
                             onChange={(e) => setEventTitle(e.target.value)}
                             required
@@ -375,60 +449,75 @@ export function Calendar() {
 
                         <div className="form-group">
                             <label className="form-label" htmlFor="eventTimeInput">
-                                Waktu
+                                Waktu / Jam
                             </label>
                             <input
                                 id="eventTimeInput"
-                                type="time"
+                                type="text"
                                 className="form-input"
+                                placeholder="Contoh: 08:00 - 09:40 WIB"
                                 value={eventTime}
                                 onChange={(e) => setEventTime(e.target.value)}
                             />
                         </div>
                     </div>
 
+                    <div className="form-group">
+                        <label className="form-label" htmlFor="eventTypeSelect">
+                            Kategori Agenda
+                        </label>
+                        <select
+                            id="eventTypeSelect"
+                            className="form-select"
+                            value={eventType}
+                            onChange={(e) => setEventType(e.target.value)}
+                        >
+                            <option value="kuliah">Kuliah Tatap Muka</option>
+                            <option value="ujian">Quiz / Evaluasi / Ujian</option>
+                            <option value="tugas">Pengumpulan Tugas</option>
+                            <option value="libur">Hari Libur Perkuliahan</option>
+                        </select>
+                    </div>
+
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                         <div className="form-group">
-                            <label className="form-label" htmlFor="eventTypeSelect">
-                                Kategori Agenda
+                            <label className="form-label" htmlFor="eventRoomInput">
+                                Ruang Kelas
                             </label>
-                            <select
-                                id="eventTypeSelect"
-                                className="form-select"
-                                value={eventType}
-                                onChange={(e) => setEventType(e.target.value)}
-                            >
-                                <option value="kuliah">Kuliah Tatap Muka</option>
-                                <option value="tugas">Batas Akhir Tugas</option>
-                                <option value="ujian">UTS / UAS</option>
-                                <option value="libur">Hari Libur Perkuliahan</option>
-                            </select>
+                            <input
+                                id="eventRoomInput"
+                                type="text"
+                                className="form-input"
+                                placeholder="Contoh: R.304 / Lab 2"
+                                value={eventRoom}
+                                onChange={(e) => setEventRoom(e.target.value)}
+                            />
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="eventLocationInput">
-                                Lokasi / Ruangan
+                            <label className="form-label" htmlFor="eventBuildingInput">
+                                Gedung
                             </label>
                             <input
-                                id="eventLocationInput"
+                                id="eventBuildingInput"
                                 type="text"
                                 className="form-input"
-                                placeholder="Gedung / Link Daring"
-                                value={eventLocation}
-                                onChange={(e) => setEventLocation(e.target.value)}
+                                placeholder="Contoh: Gedung F / Kampus Utama"
+                                value={eventBuilding}
+                                onChange={(e) => setEventBuilding(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className="form-group">
                         <label className="form-label" htmlFor="eventDescInput">
-                            Keterangan Tambahan
+                            Keterangan Tambahan / Perlengkapan
                         </label>
                         <textarea
                             id="eventDescInput"
                             className="form-textarea"
                             rows={3}
-                            placeholder="Catatan materi atau perlengkapan yang perlu dibawa..."
+                            placeholder="Contoh: Membawa laptop dengan aplikasi SPSS/Excel terpasang, berpakaian rapi..."
                             value={eventDescription}
                             onChange={(e) => setEventDescription(e.target.value)}
                         />
@@ -448,7 +537,7 @@ export function Calendar() {
                             className="btn btn-primary btn-sm"
                             disabled={savingEvent}
                         >
-                            {savingEvent ? 'Menyimpan...' : 'Simpan Agenda'}
+                            {savingEvent ? 'Menyimpan...' : 'Simpan & Siarkan Agenda'}
                         </button>
                     </div>
                 </form>

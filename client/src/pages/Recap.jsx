@@ -124,15 +124,22 @@ export function Recap() {
         }
     };
 
+    const isAdmin = user?.role === 'admin';
+    const studentItem = !isAdmin && recapData.length > 0 ? recapData[0] : null;
+
     return (
         <div>
             <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
-                    <h1 className="page-title">Rekapitulasi Kehadiran</h1>
-                    <p className="page-subtitle">Daftar kehadiran seluruh mahasiswa Mata Kuliah Statistika - Kelas TI25C dengan evaluasi syarat minimal UAS (40%)</p>
+                    <h1 className="page-title">{isAdmin ? 'Rekapitulasi Kehadiran Kelas' : 'Rekapitulasi Kehadiran Pribadi'}</h1>
+                    <p className="page-subtitle">
+                        {isAdmin
+                            ? 'Daftar kehadiran seluruh mahasiswa Mata Kuliah Statistika - Kelas TI25C dengan evaluasi syarat minimal UAS (40%)'
+                            : `Rekapitulasi resmi kehadiran perkuliahan untuk ${user?.name || 'Mahasiswa'}. Sesuai kebijakan privasi kelas, hanya data kehadiran Anda yang ditampilkan.`}
+                    </p>
                 </div>
 
-                {user?.role === 'admin' && (
+                {isAdmin && (
                     <div style={{ display: 'flex', gap: '8px' }}>
                         <button
                             type="button"
@@ -153,103 +160,162 @@ export function Recap() {
             </div>
 
             {/* Ringkasan Statistik */}
-            <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-                <div className="stat-card">
-                    <div className="stat-icon primary">
-                        <BarChartIcon size={22} />
+            {isAdmin ? (
+                <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+                    <div className="stat-card">
+                        <div className="stat-icon primary">
+                            <BarChartIcon size={22} />
+                        </div>
+                        <div className="stat-info">
+                            <h3 style={{ color: 'var(--color-accent)' }}>{averagePercentage}%</h3>
+                            <p>Rata-rata Kehadiran Kelas</p>
+                        </div>
                     </div>
-                    <div className="stat-info">
-                        <h3 style={{ color: 'var(--color-accent)' }}>{averagePercentage}%</h3>
-                        <p>Rata-rata Kehadiran Kelas</p>
-                    </div>
-                </div>
 
-                <div className="stat-card">
-                    <div className="stat-icon success">
-                        <CheckCircleIcon size={22} />
+                    <div className="stat-card">
+                        <div className="stat-icon success">
+                            <CheckCircleIcon size={22} />
+                        </div>
+                        <div className="stat-info">
+                            <h3>{totalAman + totalWaspada}</h3>
+                            <p>Lolos Syarat UAS (&gt;= 40%)</p>
+                        </div>
                     </div>
-                    <div className="stat-info">
-                        <h3>{totalAman + totalWaspada}</h3>
-                        <p>Lolos Syarat UAS (&gt;= 40%)</p>
-                    </div>
-                </div>
 
-                <div className="stat-card">
-                    <div className="stat-icon warning">
-                        <AlertCircleIcon size={22} />
+                    <div className="stat-card">
+                        <div className="stat-icon warning">
+                            <AlertCircleIcon size={22} />
+                        </div>
+                        <div className="stat-info">
+                            <h3>{totalWaspada}</h3>
+                            <p>Waspada (40% - 54%)</p>
+                        </div>
                     </div>
-                    <div className="stat-info">
-                        <h3>{totalWaspada}</h3>
-                        <p>Waspada (40% - 54%)</p>
-                    </div>
-                </div>
 
-                <div className="stat-card">
-                    <div className="stat-icon danger">
-                        <AlertCircleIcon size={22} />
-                    </div>
-                    <div className="stat-info">
-                        <h3 style={{ color: 'var(--color-danger)' }}>{totalKritis}</h3>
-                        <p>Kritis / Tidak Lolos (&lt; 40%)</p>
+                    <div className="stat-card">
+                        <div className="stat-icon danger">
+                            <AlertCircleIcon size={22} />
+                        </div>
+                        <div className="stat-info">
+                            <h3 style={{ color: 'var(--color-danger)' }}>{totalKritis}</h3>
+                            <p>Kritis / Tidak Lolos (&lt; 40%)</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            ) : (
+                <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+                    <div className="stat-card">
+                        <div className="stat-icon primary">
+                            <BarChartIcon size={22} />
+                        </div>
+                        <div className="stat-info">
+                            <h3 style={{ color: 'var(--color-accent)' }}>{studentItem?.percentage ?? 0}%</h3>
+                            <p>Persentase Kehadiran Anda</p>
+                        </div>
+                    </div>
+
+                    <div className="stat-card">
+                        <div className="stat-icon success">
+                            <CheckCircleIcon size={22} />
+                        </div>
+                        <div className="stat-info">
+                            <h3>{studentItem?.counts?.hadir ?? 0} Sesi</h3>
+                            <p>Hadir Mengikuti Kelas</p>
+                        </div>
+                    </div>
+
+                    <div className="stat-card">
+                        <div className="stat-icon warning">
+                            <AlertCircleIcon size={22} />
+                        </div>
+                        <div className="stat-info">
+                            <h3>{(studentItem?.counts?.izin ?? 0) + (studentItem?.counts?.sakit ?? 0)} Sesi</h3>
+                            <p>Izin ({studentItem?.counts?.izin ?? 0}) & Sakit ({studentItem?.counts?.sakit ?? 0})</p>
+                        </div>
+                    </div>
+
+                    <div className="stat-card">
+                        <div className="stat-icon danger">
+                            <AlertCircleIcon size={22} />
+                        </div>
+                        <div className="stat-info">
+                            <h3 style={{ color: (studentItem?.counts?.alpha ?? 0) > 0 ? 'var(--color-danger)' : 'var(--color-text)' }}>
+                                {studentItem?.counts?.alpha ?? 0} Sesi
+                            </h3>
+                            <p>Alpha / Tanpa Keterangan</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Filter & Navigasi Tampilan */}
             <div className="card" style={{ marginBottom: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: '1 1 320px' }}>
-                        <div style={{ position: 'relative', width: '100%' }}>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="Cari nama mahasiswa..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{ paddingLeft: '36px' }}
-                            />
-                            <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}>
-                                <SearchIcon size={16} />
+                    {isAdmin ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: '1 1 320px' }}>
+                            <div style={{ position: 'relative', width: '100%' }}>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="Cari nama mahasiswa..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    style={{ paddingLeft: '36px' }}
+                                />
+                                <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}>
+                                    <SearchIcon size={16} />
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span className="badge-status badge-hadir" style={{ fontSize: '0.75rem', padding: '4px 10px' }}>
+                                Privasi Terjaga
+                            </span>
+                            <span style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)' }}>
+                                Menampilkan rekapitulasi akun {user?.name}
+                            </span>
+                        </div>
+                    )}
 
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                        {/* Filter Status Syarat UAS */}
-                        <div style={{ display: 'flex', gap: '4px', background: 'var(--color-bg-hover)', padding: '4px', borderRadius: 'var(--radius-md)' }}>
-                            <button
-                                type="button"
-                                className={`btn btn-sm ${statusFilter === 'all' ? 'btn-primary' : 'btn-ghost'}`}
-                                onClick={() => setStatusFilter('all')}
-                                style={{ padding: '4px 10px', fontSize: '0.75rem' }}
-                            >
-                                Semua ({recapData.length})
-                            </button>
-                            <button
-                                type="button"
-                                className={`btn btn-sm ${statusFilter === 'aman' ? 'btn-primary' : 'btn-ghost'}`}
-                                onClick={() => setStatusFilter('aman')}
-                                style={{ padding: '4px 10px', fontSize: '0.75rem' }}
-                            >
-                                Aman ({totalAman})
-                            </button>
-                            <button
-                                type="button"
-                                className={`btn btn-sm ${statusFilter === 'waspada' ? 'btn-primary' : 'btn-ghost'}`}
-                                onClick={() => setStatusFilter('waspada')}
-                                style={{ padding: '4px 10px', fontSize: '0.75rem' }}
-                            >
-                                Waspada ({totalWaspada})
-                            </button>
-                            <button
-                                type="button"
-                                className={`btn btn-sm ${statusFilter === 'kritis' ? 'btn-primary' : 'btn-ghost'}`}
-                                onClick={() => setStatusFilter('kritis')}
-                                style={{ padding: '4px 10px', fontSize: '0.75rem', color: statusFilter === 'kritis' ? '#ffffff' : 'var(--color-danger)' }}
-                            >
-                                Kritis &lt; 40% ({totalKritis})
-                            </button>
-                        </div>
+                        {/* Filter Status Syarat UAS (Admin Only) */}
+                        {isAdmin && (
+                            <div style={{ display: 'flex', gap: '4px', background: 'var(--color-bg-hover)', padding: '4px', borderRadius: 'var(--radius-md)' }}>
+                                <button
+                                    type="button"
+                                    className={`btn btn-sm ${statusFilter === 'all' ? 'btn-primary' : 'btn-ghost'}`}
+                                    onClick={() => setStatusFilter('all')}
+                                    style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                                >
+                                    Semua ({recapData.length})
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`btn btn-sm ${statusFilter === 'aman' ? 'btn-primary' : 'btn-ghost'}`}
+                                    onClick={() => setStatusFilter('aman')}
+                                    style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                                >
+                                    Aman ({totalAman})
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`btn btn-sm ${statusFilter === 'waspada' ? 'btn-primary' : 'btn-ghost'}`}
+                                    onClick={() => setStatusFilter('waspada')}
+                                    style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                                >
+                                    Waspada ({totalWaspada})
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`btn btn-sm ${statusFilter === 'kritis' ? 'btn-primary' : 'btn-ghost'}`}
+                                    onClick={() => setStatusFilter('kritis')}
+                                    style={{ padding: '4px 10px', fontSize: '0.75rem', color: statusFilter === 'kritis' ? '#ffffff' : 'var(--color-danger)' }}
+                                >
+                                    Kritis &lt; 40% ({totalKritis})
+                                </button>
+                            </div>
+                        )}
 
                         <div className="tabs" style={{ margin: 0, borderBottom: 'none' }}>
                             <button

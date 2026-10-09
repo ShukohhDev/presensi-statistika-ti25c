@@ -223,6 +223,20 @@ export function Tasks() {
         }
     };
 
+    const handleDeleteTask = async (id, title) => {
+        if (!window.confirm(`Hapus berkas tugas "${title}"? Berkas ini akan dihapus permanen.`)) {
+            return;
+        }
+
+        try {
+            await api.deleteTask(id);
+            addToast('Berkas tugas berhasil dihapus.', 'success');
+            await loadTaskData();
+        } catch (err) {
+            addToast(err.message || 'Gagal menghapus berkas tugas.', 'error');
+        }
+    };
+
     const handleViewSlotStatus = async (slot) => {
         setSelectedSlotForStatus(slot);
         setShowSlotStatusModal(true);
@@ -586,6 +600,7 @@ export function Tasks() {
                                         <th>Ukuran</th>
                                         <th>Tanggal Kumpul</th>
                                         <th>Status / Tautan</th>
+                                        <th style={{ textAlign: 'center', width: '80px' }}>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -628,6 +643,17 @@ export function Tasks() {
                                                         </a>
                                                     )}
                                                 </div>
+                                            </td>
+                                            <td style={{ textAlign: 'center' }}>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-ghost btn-sm"
+                                                    onClick={() => handleDeleteTask(t.id, t.task_title || t.file_name)}
+                                                    style={{ color: 'var(--color-danger)', padding: '4px 8px', fontSize: '0.75rem' }}
+                                                    title="Hapus berkas tugas ini"
+                                                >
+                                                    <TrashIcon size={14} /> Hapus
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
@@ -822,6 +848,7 @@ export function Tasks() {
                                         <th>Ukuran</th>
                                         <th>Tanggal Kumpul</th>
                                         <th>Berkas / Tautan</th>
+                                        <th style={{ textAlign: 'center', width: '80px' }}>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -876,6 +903,17 @@ export function Tasks() {
                                                          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Lokal</span>
                                                      )}
                                                  </div>
+                                             </td>
+                                             <td style={{ textAlign: 'center' }}>
+                                                 <button
+                                                     type="button"
+                                                     className="btn btn-ghost btn-sm"
+                                                     onClick={() => handleDeleteTask(t.id, `${t.student_name} - ${t.task_title || t.file_name}`)}
+                                                     style={{ color: 'var(--color-danger)', padding: '4px 8px', fontSize: '0.75rem' }}
+                                                     title="Hapus berkas ini sebagai admin"
+                                                 >
+                                                     <TrashIcon size={14} /> Hapus
+                                                 </button>
                                              </td>
                                          </tr>
                                      ))}

@@ -122,25 +122,46 @@ router.get('/students', authenticateToken, requireAdmin, (req, res) => {
     }
 });
 
-// GET /api/admin/export/excel - Export rekap ke Excel
+// GET /api/admin/export/excel - Export rekap ke Excel dengan format akademik rapi
 router.get('/export/excel', authenticateToken, requireAdmin, (req, res) => {
     try {
         const db = getDb();
         const users = db.prepare("SELECT id, name FROM users WHERE role = 'user' ORDER BY name").all();
         const sessions = db.prepare('SELECT * FROM sessions ORDER BY meeting_number ASC').all();
+        const courseInfo = db.prepare('SELECT * FROM course_info WHERE id = 1').get() || {};
 
-        // Buat data untuk Excel
         const data = [];
 
-        // Header row
+        // Header Dokumen Akademik
+        data.push(['DAFTAR HADIR DAN REKAPITULASI KEHADIRAN MAHASISWA']);
+        data.push(['PROGRAM STUDI TEKNIK INFORMATIKA - KELAS TI25C']);
+        data.push(['MATA KULIAH: STATISTIKA DAN PROBABILITAS']);
+        data.push([
+            `Dosen Pengampu: ${courseInfo.lecturer_name || 'Dosen Pengampu'}`,
+            '',
+            `NIP: ${courseInfo.lecturer_nip || '-'}`
+        ]);
+        data.push([
+            `Jadwal Perkuliahan: ${courseInfo.schedule_day || 'Kamis'}, ${courseInfo.schedule_time || '08:00 - 09:40 WIB'}`,
+            '',
+            `Ruang: ${courseInfo.room || 'Ruang Kuliah'}`
+        ]);
+        data.push([
+            `Penanggung Jawab (PJ MK): Shukoh#Dev`,
+            '',
+            `Tanggal Unduh: ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`
+        ]);
+        data.push([]); // Baris kosong pemisah
+
+        // Baris Header Kolom Tabel
         const headerRow = ['No', 'Nama Mahasiswa'];
         sessions.forEach(s => {
             headerRow.push(`P${s.meeting_number}`);
         });
-        headerRow.push('Hadir', 'Izin', 'Sakit', 'Alpha', 'Persentase');
+        headerRow.push('Hadir (H)', 'Izin (I)', 'Sakit (S)', 'Alpha (A)', 'Total Sesi', 'Persentase Kehadiran', 'Status Syarat UAS');
         data.push(headerRow);
 
-        // Data rows
+        // Baris Data Tiap Mahasiswa
         users.forEach((user, index) => {
             const row = [index + 1, user.name];
             let hadir = 0, izin = 0, sakit = 0, alpha = 0;
@@ -159,28 +180,56 @@ router.get('/export/excel', authenticateToken, requireAdmin, (req, res) => {
                 }
             });
 
-            const percentage = sessions.length > 0
-                ? Math.round((hadir / sessions.length) * 100) + '%'
-                : '0%';
+            const percentNum = sessions.length > 0
+                ? Math.round((hadir / sessions.length) * 100)
+                : 0;
+            const percentage = `${percentNum}%`;
+            const uasStatus = percentNum >= 75
+                ? 'MEMENUHI SYARAT'
+                : percentNum >= 40
+                ? 'WASPADAI KEHADIRAN'
+                : 'TIDAK MEMENUHI (< 40%)';
 
-            row.push(hadir, izin, sakit, alpha, percentage);
+            row.push(hadir, izin, sakit, alpha, sessions.length, percentage, uasStatus);
             data.push(row);
         });
+
+        // Baris Keterangan di Bawah Tabel
+        data.push([]);
+        data.push(['Keterangan Kode Kehadiran:']);
+        data.push(['H', 'Hadir mengikuti perkuliahan']);
+        data.push(['I', 'Izin resmi']);
+        data.push(['S', 'Sakit (dengan surat/keterangan)']);
+        data.push(['A', 'Alpha / Tanpa keterangan']);
+        data.push([]);
+        data.push(['Catatan Akademik:']);
+        data.push(['1. Syarat kelayakan mengikuti Ujian Akhir Semester (UAS) minimal kehadiran sesuai ketentuan akademik prodi.']);
+        data.push(['2. Dokumen ini digenerate secara otomatis oleh Sistem Presensi TI25C untuk keperluan arsip dosen pengampu.']);
 
         // Buat workbook
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(data);
 
-        // Set column widths
-        ws['!cols'] = [
-            { wch: 5 },  // No
-            { wch: 40 }, // Nama
-            ...sessions.map(() => ({ wch: 5 })),
-            { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 },
-            { wch: 12 }
+        // Lebar kolom rapi
+        const cols = [
+            { wch: 6 },  // No
+            { wch: 38 }, // Nama
         ];
+        sessions.forEach(() => {
+            cols.push({ wch: 6 }); // P1..Pn
+        });
+        cols.push(
+            { wch: 10 }, // Hadir
+            { wch: 10 }, // Izin
+            { wch: 10 }, // Sakit
+            { wch: 10 }, // Alpha
+            { wch: 12 }, // Total Sesi
+            { wch: 22 }, // Persentase Kehadiran
+            { wch: 24 }  // Status Syarat UAS
+        );
+        ws['!cols'] = cols;
 
-        XLSX.utils.book_append_sheet(wb, ws, 'Rekap Kehadiran');
+        XLSX.utils.book_append_sheet(wb, ws, 'Rekapitulasi Kehadiran');
 
         const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 
@@ -202,7 +251,7 @@ router.get('/export/csv', authenticateToken, requireAdmin, (req, res) => {
 
         let csv = 'No,Nama Mahasiswa';
         sessions.forEach(s => { csv += `,P${s.meeting_number}`; });
-        csv += ',Hadir,Izin,Sakit,Alpha,Persentase\n';
+        csv += ',Hadir,Izin,Sakit,Alpha,Total Sesi,Persentase,Status UAS\n';
 
         users.forEach((user, index) => {
             let row = `${index + 1},"${user.name}"`;
@@ -222,11 +271,13 @@ router.get('/export/csv', authenticateToken, requireAdmin, (req, res) => {
                 }
             });
 
-            const percentage = sessions.length > 0
-                ? Math.round((hadir / sessions.length) * 100) + '%'
-                : '0%';
+            const percentNum = sessions.length > 0
+                ? Math.round((hadir / sessions.length) * 100)
+                : 0;
+            const percentage = `${percentNum}%`;
+            const uasStatus = percentNum >= 75 ? 'Memenuhi' : percentNum >= 40 ? 'Waspada' : 'Kritis';
 
-            row += `,${hadir},${izin},${sakit},${alpha},${percentage}`;
+            row += `,${hadir},${izin},${sakit},${alpha},${sessions.length},${percentage},"${uasStatus}"`;
             csv += row + '\n';
         });
 

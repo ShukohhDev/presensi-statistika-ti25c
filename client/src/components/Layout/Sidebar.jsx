@@ -80,16 +80,7 @@ export function Sidebar({ isOpen, onClose }) {
                 <div className="sidebar-section">
                     <div className="sidebar-section-title">Menu Utama</div>
 
-                    <NavLink
-                        to="/presensi"
-                        className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
-                        onClick={onClose}
-                    >
-                        <CheckCircleIcon size={18} />
-                        <span>Presensi</span>
-                    </NavLink>
-
-                    {user?.role === 'admin' && (
+                    {user?.role === 'admin' ? (
                         <NavLink
                             to="/admin"
                             className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
@@ -97,6 +88,15 @@ export function Sidebar({ isOpen, onClose }) {
                         >
                             <ShieldIcon size={18} />
                             <span>Dashboard Admin</span>
+                        </NavLink>
+                    ) : (
+                        <NavLink
+                            to="/presensi"
+                            className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
+                            onClick={onClose}
+                        >
+                            <CheckCircleIcon size={18} />
+                            <span>Presensi</span>
                         </NavLink>
                     )}
 
@@ -118,14 +118,16 @@ export function Sidebar({ isOpen, onClose }) {
                         <span>Pengumpulan Tugas</span>
                     </NavLink>
 
-                    <NavLink
-                        to="/riwayat"
-                        className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
-                        onClick={onClose}
-                    >
-                        <HistoryIcon size={18} />
-                        <span>Riwayat</span>
-                    </NavLink>
+                    {user?.role !== 'admin' && (
+                        <NavLink
+                            to="/riwayat"
+                            className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
+                            onClick={onClose}
+                        >
+                            <HistoryIcon size={18} />
+                            <span>Riwayat</span>
+                        </NavLink>
+                    )}
 
                     <NavLink
                         to="/materi"

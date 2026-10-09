@@ -52,6 +52,30 @@ function AdminRoute({ children }) {
     return children;
 }
 
+function StudentOnlyRoute({ children }) {
+    const { user, loading } = useAuth();
+
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--color-text-secondary)' }}>
+                Memuat...
+            </div>
+        );
+    }
+
+    if (user?.role === 'admin') {
+        return <Navigate to="/admin" replace />;
+    }
+
+    return children;
+}
+
+function HomeRedirect() {
+    const { user, loading } = useAuth();
+    if (loading) return null;
+    return <Navigate to={user?.role === 'admin' ? '/admin' : '/presensi'} replace />;
+}
+
 function App() {
     return (
         <AuthProvider>
@@ -71,8 +95,15 @@ function App() {
                                     </ProtectedRoute>
                                 }
                             >
-                                <Route index element={<Navigate to="/presensi" replace />} />
-                                <Route path="presensi" element={<Attendance />} />
+                                <Route index element={<HomeRedirect />} />
+                                <Route
+                                    path="presensi"
+                                    element={
+                                        <StudentOnlyRoute>
+                                            <Attendance />
+                                        </StudentOnlyRoute>
+                                    }
+                                />
                                 <Route
                                     path="admin"
                                     element={
@@ -83,7 +114,14 @@ function App() {
                                 />
                                 <Route path="rekap" element={<Recap />} />
                                 <Route path="tugas" element={<Tasks />} />
-                                <Route path="riwayat" element={<History />} />
+                                <Route
+                                    path="riwayat"
+                                    element={
+                                        <StudentOnlyRoute>
+                                            <History />
+                                        </StudentOnlyRoute>
+                                    }
+                                />
                                 <Route path="profil" element={<Profile />} />
                                 <Route path="laporan" element={<Reports />} />
                                 <Route path="kalender" element={<Calendar />} />
@@ -91,7 +129,7 @@ function App() {
                             </Route>
 
                             {/* Catch-all route */}
-                            <Route path="*" element={<Navigate to="/presensi" replace />} />
+                            <Route path="*" element={<HomeRedirect />} />
                         </Routes>
                     </BrowserRouter>
                 </ToastProvider>
