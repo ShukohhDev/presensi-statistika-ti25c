@@ -18,7 +18,7 @@ import {
     ExternalLinkIcon
 } from '../components/Common/Icons';
 
-const OFFICIAL_DRIVE_FOLDER_URL = 'https://drive.google.com/drive/folders/1PTZksUKnP6_1q2vWeFOl6whu9Cy5bOw4';
+const OFFICIAL_DRIVE_FOLDER_URL = 'https://drive.google.com/drive/folders/1gzYtiqFXn6lyyr4sDQa6jfXsb7qBHq9L';
 
 export function Tasks() {
     const { user } = useAuth();

@@ -1,8 +1,8 @@
 const { google } = require('googleapis');
 const fs = require('fs');
 
-const DEFAULT_FOLDER_ID = '1PTZksUKnP6_1q2vWeFOl6whu9Cy5bOw4';
-const DEFAULT_FOLDER_URL = 'https://drive.google.com/drive/folders/1PTZksUKnP6_1q2vWeFOl6whu9Cy5bOw4';
+const DEFAULT_FOLDER_ID = '1gzYtiqFXn6lyyr4sDQa6jfXsb7qBHq9L';
+const DEFAULT_FOLDER_URL = 'https://drive.google.com/drive/folders/1gzYtiqFXn6lyyr4sDQa6jfXsb7qBHq9L';
 
 /**
  * Service untuk mengunggah berkas ke Google Drive
