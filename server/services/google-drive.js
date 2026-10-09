@@ -19,12 +19,15 @@ async function uploadToDrive(filePath, fileName, mimeType) {
 
     try {
         if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
+            const clientId = process.env.GOOGLE_CLIENT_ID.trim().replace(/^["']|["']$/g, '');
+            const clientSecret = process.env.GOOGLE_CLIENT_SECRET.trim().replace(/^["']|["']$/g, '');
+            const refreshToken = process.env.GOOGLE_REFRESH_TOKEN.trim().replace(/^["']|["']$/g, '');
             const oauth2Client = new google.auth.OAuth2(
-                process.env.GOOGLE_CLIENT_ID,
-                process.env.GOOGLE_CLIENT_SECRET,
+                clientId,
+                clientSecret,
                 'https://developers.google.com/oauthplayground'
             );
-            oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+            oauth2Client.setCredentials({ refresh_token: refreshToken });
             authClient = oauth2Client;
         } else if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
             let jsonStr = process.env.GOOGLE_SERVICE_ACCOUNT_JSON.trim();
@@ -119,12 +122,15 @@ async function testDriveConnection() {
     try {
         let authClient = null;
         if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
+            const clientId = process.env.GOOGLE_CLIENT_ID.trim().replace(/^["']|["']$/g, '');
+            const clientSecret = process.env.GOOGLE_CLIENT_SECRET.trim().replace(/^["']|["']$/g, '');
+            const refreshToken = process.env.GOOGLE_REFRESH_TOKEN.trim().replace(/^["']|["']$/g, '');
             const oauth2Client = new google.auth.OAuth2(
-                process.env.GOOGLE_CLIENT_ID,
-                process.env.GOOGLE_CLIENT_SECRET,
+                clientId,
+                clientSecret,
                 'https://developers.google.com/oauthplayground'
             );
-            oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+            oauth2Client.setCredentials({ refresh_token: refreshToken });
             authClient = oauth2Client;
         } else if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
             let jsonStr = process.env.GOOGLE_SERVICE_ACCOUNT_JSON.trim();
