@@ -4,7 +4,17 @@ const { getDb } = require('../config/database');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const { uploadTask } = require('../middleware/upload');
 
-const { uploadToDrive, DEFAULT_FOLDER_URL } = require('../services/google-drive');
+const { uploadToDrive, testDriveConnection, DEFAULT_FOLDER_URL } = require('../services/google-drive');
+
+// GET /api/tasks/test-drive - Uji status koneksi Google Drive
+router.get('/test-drive', authenticateToken, async (req, res) => {
+    try {
+        const result = await testDriveConnection();
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 // POST /api/tasks/upload - Upload tugas
 router.post('/upload', authenticateToken, uploadTask.single('file'), async (req, res) => {

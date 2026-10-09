@@ -19,11 +19,14 @@ async function uploadToDrive(filePath, fileName, mimeType) {
 
     try {
         if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
-            const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
-            authClient = new google.auth.GoogleAuth({
-                credentials,
-                scopes: ['https://www.googleapis.com/auth/drive'],
-            });
+            let jsonStr = process.env.GOOGLE_SERVICE_ACCOUNT_JSON.trim();
+            if ((jsonStr.startsWith("'") && jsonStr.endsWith("'")) || (jsonStr.startsWith('"') && jsonStr.endsWith('"') && !jsonStr.startsWith('{"'))) {
+                jsonStr = jsonStr.slice(1, -1);
+            }
+            const credentials = typeof jsonStr === 'object' ? jsonStr : JSON.parse(jsonStr);
+            const jwtClient = google.auth.fromJSON(credentials);
+            jwtClient.scopes = ['https://www.googleapis.com/auth/drive'];
+            authClient = jwtClient;
         } else if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE && fs.existsSync(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE)) {
             authClient = new google.auth.GoogleAuth({
                 keyFile: process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE,
@@ -47,7 +50,7 @@ async function uploadToDrive(filePath, fileName, mimeType) {
         }
 
         if (!authClient) {
-            // Kredensial belum disetel di Railway/server
+            console.warn('[Google Drive] Variabel kredensial belum disetel. Menyimpan file ke penyimpanan lokal.');
             return {
                 googleDriveId: null,
                 googleDriveLink: DEFAULT_FOLDER_URL,
@@ -68,11 +71,16 @@ async function uploadToDrive(filePath, fileName, mimeType) {
             body: fs.createReadStream(filePath),
         };
 
+        console.log(`[Google Drive] Mengunggah "${fileName}" ke folder ${folderId}...`);
+
         const response = await drive.files.create({
-            resource: fileMetadata,
+            requestBody: fileMetadata,
             media: media,
-            fields: 'id, webViewLink, webContentLink',
+            fields: 'id, name, webViewLink, webContentLink',
+            supportsAllDrives: true,
         });
+
+        console.log(`[Google Drive] Berhasil! ID berkas: ${response.data.id}`);
 
         return {
             googleDriveId: response.data.id,
@@ -81,15 +89,68 @@ async function uploadToDrive(filePath, fileName, mimeType) {
             folderUrl: DEFAULT_FOLDER_URL
         };
     } catch (err) {
-        console.error('Google Drive Upload Error:', err.message);
+        console.error('[Google Drive Upload Error Details]:', {
+            message: err.message,
+            code: err.code,
+            status: err.status,
+            errors: err.errors || err.response?.data
+        });
         return {
             googleDriveId: null,
             googleDriveLink: DEFAULT_FOLDER_URL,
             isLocal: true,
-            folderUrl: DEFAULT_FOLDER_URL
+            folderUrl: DEFAULT_FOLDER_URL,
+            error: err.message
         };
     }
 }
 
-module.exports = { uploadToDrive, DEFAULT_FOLDER_ID, DEFAULT_FOLDER_URL };
+async function testDriveConnection() {
+    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID || DEFAULT_FOLDER_ID;
+    
+    if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON && !process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE && !process.env.GOOGLE_CLIENT_ID) {
+        return {
+            success: false,
+            message: 'Variabel GOOGLE_SERVICE_ACCOUNT_JSON belum disetel di server.',
+            folderId
+        };
+    }
+
+    try {
+        let authClient = null;
+        if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+            let jsonStr = process.env.GOOGLE_SERVICE_ACCOUNT_JSON.trim();
+            if ((jsonStr.startsWith("'") && jsonStr.endsWith("'")) || (jsonStr.startsWith('"') && jsonStr.endsWith('"') && !jsonStr.startsWith('{"'))) {
+                jsonStr = jsonStr.slice(1, -1);
+            }
+            const credentials = typeof jsonStr === 'object' ? jsonStr : JSON.parse(jsonStr);
+            const jwtClient = google.auth.fromJSON(credentials);
+            jwtClient.scopes = ['https://www.googleapis.com/auth/drive'];
+            authClient = jwtClient;
+        }
+
+        const drive = google.drive({ version: 'v3', auth: authClient });
+        const folder = await drive.files.get({
+            fileId: folderId,
+            fields: 'id, name, mimeType, capabilities',
+            supportsAllDrives: true,
+        });
+
+        return {
+            success: true,
+            message: `Koneksi berhasil! Terhubung ke folder: "${folder.data.name}"`,
+            folder: folder.data
+        };
+    } catch (err) {
+        return {
+            success: false,
+            message: err.message,
+            code: err.code,
+            details: err.response?.data || err.errors
+        };
+    }
+}
+
+module.exports = { uploadToDrive, testDriveConnection, DEFAULT_FOLDER_ID, DEFAULT_FOLDER_URL };
+
 

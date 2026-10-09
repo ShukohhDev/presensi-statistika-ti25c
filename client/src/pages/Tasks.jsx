@@ -59,6 +59,23 @@ export function Tasks() {
     const [loadingSlotStatus, setLoadingSlotStatus] = useState(false);
     const [searchSlotStatus, setSearchSlotStatus] = useState('');
     const [searchAllTasks, setSearchAllTasks] = useState('');
+    const [isTestingDrive, setIsTestingDrive] = useState(false);
+
+    const handleTestDrive = async () => {
+        try {
+            setIsTestingDrive(true);
+            const res = await api.testDriveConnection();
+            if (res.success) {
+                addToast(res.message, 'success');
+            } else {
+                addToast(`Kendala Drive: ${res.message}`, 'error');
+            }
+        } catch (err) {
+            addToast(err.message || 'Gagal menguji koneksi Google Drive.', 'error');
+        } finally {
+            setIsTestingDrive(false);
+        }
+    };
 
     const loadTaskData = useCallback(async () => {
         try {
@@ -283,15 +300,28 @@ export function Tasks() {
                         Seluruh berkas tugas kelas diarahkan ke folder Google Drive resmi. Anda dapat membuka atau mengecek berkas langsung di folder Drive.
                     </p>
                 </div>
-                <a
-                    href={OFFICIAL_DRIVE_FOLDER_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-secondary btn-sm"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                >
-                    <ExternalLinkIcon size={14} /> Buka Folder Google Drive
-                </a>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {user?.role === 'admin' && (
+                        <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            onClick={handleTestDrive}
+                            disabled={isTestingDrive}
+                            title="Uji apakah server berhasil terhubung ke Google Drive"
+                        >
+                            <RefreshIcon size={14} /> {isTestingDrive ? 'Menguji...' : 'Uji Koneksi Drive'}
+                        </button>
+                    )}
+                    <a
+                        href={OFFICIAL_DRIVE_FOLDER_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-secondary btn-sm"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                    >
+                        <ExternalLinkIcon size={14} /> Buka Folder Google Drive
+                    </a>
+                </div>
             </div>
 
             {/* Navigasi Tab */}

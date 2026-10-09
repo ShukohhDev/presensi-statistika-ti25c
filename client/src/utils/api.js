@@ -148,6 +148,8 @@ export const api = {
         request('/api/tasks/history'),
     getAllTasks: () =>
         request('/api/tasks/all'),
+    testDriveConnection: () =>
+        request('/api/tasks/test-drive'),
 
     // Reports
     createReport: (category, title, description) =>
