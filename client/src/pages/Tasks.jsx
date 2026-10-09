@@ -14,8 +14,11 @@ import {
     TrashIcon,
     XIcon,
     WhatsAppIcon,
-    SearchIcon
+    SearchIcon,
+    ExternalLinkIcon
 } from '../components/Common/Icons';
+
+const OFFICIAL_DRIVE_FOLDER_URL = 'https://drive.google.com/drive/folders/1PTZksUKnP6_1q2vWeFOl6whu9Cy5bOw4';
 
 export function Tasks() {
     const { user } = useAuth();
@@ -26,6 +29,7 @@ export function Tasks() {
     const [taskDescription, setTaskDescription] = useState('');
     const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
     const [taskFile, setTaskFile] = useState(null);
+    const [driveLink, setDriveLink] = useState('');
     const [isUploading, setIsUploading] = useState(false);
     const [selectedAssignmentId, setSelectedAssignmentId] = useState('custom');
 
@@ -115,8 +119,8 @@ export function Tasks() {
 
     const handleUpload = async (e) => {
         e.preventDefault();
-        if (!taskFile) {
-            addToast('Silakan pilih file tugas yang akan diunggah.', 'error');
+        if (!taskFile && !driveLink.trim()) {
+            addToast('Silakan pilih berkas tugas atau masukkan tautan Google Drive Anda.', 'error');
             return;
         }
 
@@ -130,15 +134,21 @@ export function Tasks() {
             const formData = new FormData();
             formData.append('task_title', taskTitle.trim() || 'Tugas Statistika');
             formData.append('description', taskDescription.trim());
-            formData.append('file', taskFile);
+            if (taskFile) {
+                formData.append('file', taskFile);
+            }
+            if (driveLink.trim()) {
+                formData.append('drive_link', driveLink.trim());
+            }
             formData.append('submitted_date', selectedDate);
             if (selectedAssignmentId && selectedAssignmentId !== 'custom') {
                 formData.append('assignment_id', selectedAssignmentId);
             }
 
             await api.uploadTask(formData);
-            addToast('Tugas Anda berhasil diunggah.', 'success');
+            addToast('Tugas Anda berhasil dikumpulkan dan tersimpan.', 'success');
             setTaskFile(null);
+            setDriveLink('');
             setTaskTitle('');
             setTaskDescription('');
             setSelectedAssignmentId('custom');
@@ -249,6 +259,39 @@ export function Tasks() {
             <div className="page-header">
                 <h1 className="page-title">Pengumpulan Tugas</h1>
                 <p className="page-subtitle">Portal pengumpulan tugas dan berkas perkuliahan Statistika - Kelas TI25C</p>
+            </div>
+
+            {/* Banner Google Drive Terintegrasi */}
+            <div style={{
+                background: 'var(--color-bg-hover)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-md)',
+                padding: '16px 20px',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px'
+            }}>
+                <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--color-primary)' }}>
+                        <FileTextIcon size={18} />
+                        <span>Folder Google Drive Penyimpanan Tugas (Kelas TI25C)</span>
+                    </div>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '0.813rem', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
+                        Seluruh berkas tugas kelas diarahkan ke folder Google Drive resmi. Anda dapat membuka atau mengecek berkas langsung di folder Drive.
+                    </p>
+                </div>
+                <a
+                    href={OFFICIAL_DRIVE_FOLDER_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary btn-sm"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                    <ExternalLinkIcon size={14} /> Buka Folder Google Drive
+                </a>
             </div>
 
             {/* Navigasi Tab */}
@@ -393,7 +436,7 @@ export function Tasks() {
 
                         <div className="form-group">
                             <label className="form-label">
-                                Berkas Tugas (Format bebas, tanpa batasan ukuran) <span style={{ color: 'var(--color-danger)' }}>*</span>
+                                Berkas Tugas (Format bebas, tanpa batasan ukuran)
                             </label>
 
                             {!taskFile ? (
@@ -407,7 +450,7 @@ export function Tasks() {
                                     <UploadIcon size={40} />
                                     <p>Klik atau seret berkas tugas Anda ke sini</p>
                                     <span className="upload-hint">
-                                        Mendukung PDF, Word, ZIP, Gambar, dan format berkas lainnya
+                                        Mendukung PDF, Word, Excel, ZIP, Gambar, dan format berkas lainnya
                                     </span>
                                     <input
                                         id="taskFileInput"
@@ -437,10 +480,37 @@ export function Tasks() {
                             )}
                         </div>
 
+                        <div className="form-group">
+                            <label className="form-label" htmlFor="driveLinkInput">
+                                Tautan Berkas Google Drive Anda (Opsional / Alternatif)
+                            </label>
+                            <input
+                                id="driveLinkInput"
+                                type="url"
+                                className="form-input"
+                                placeholder="https://drive.google.com/file/d/... (Opsional jika berkas diunggah di atas)"
+                                value={driveLink}
+                                onChange={(e) => setDriveLink(e.target.value)}
+                            />
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px', flexWrap: 'wrap', gap: '8px' }}>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
+                                    Bila Anda mengunggah file langsung ke folder Drive kelas, salin dan tempelkan tautan file Anda ke sini.
+                                </span>
+                                <a
+                                    href={OFFICIAL_DRIVE_FOLDER_URL}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ fontSize: '0.75rem', color: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'underline' }}
+                                >
+                                    <ExternalLinkIcon size={12} /> Buka Folder Drive Kelas
+                                </a>
+                            </div>
+                        </div>
+
                         <button
                             type="submit"
                             className="btn btn-primary btn-block btn-lg"
-                            disabled={isUploading || !taskFile}
+                            disabled={isUploading || (!taskFile && !driveLink.trim())}
                             style={{ marginTop: '24px' }}
                         >
                             <UploadIcon size={18} />
@@ -522,9 +592,9 @@ export function Tasks() {
                                                             href={t.google_drive_link}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            style={{ fontSize: '0.75rem', color: 'var(--color-primary)', textDecoration: 'underline' }}
+                                                            style={{ fontSize: '0.75rem', color: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '3px', textDecoration: 'underline' }}
                                                         >
-                                                            Drive
+                                                            <ExternalLinkIcon size={12} /> Drive
                                                         </a>
                                                     )}
                                                 </div>
@@ -548,7 +618,16 @@ export function Tasks() {
                                 Buat dan atur slot tugas agar pengumpulan tugas mahasiswa terdata rapi sesuai batas waktu.
                             </p>
                         </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                            <a
+                                href={OFFICIAL_DRIVE_FOLDER_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-secondary btn-sm"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                            >
+                                <ExternalLinkIcon size={14} /> Buka Google Drive
+                            </a>
                             <button
                                 type="button"
                                 className="btn btn-primary btn-sm"
@@ -657,8 +736,17 @@ export function Tasks() {
                                 Pantau dan unduh berkas tugas yang telah dikirimkan oleh seluruh mahasiswa.
                             </p>
                         </div>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                            <div style={{ position: 'relative', width: '240px' }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <a
+                                href={OFFICIAL_DRIVE_FOLDER_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-secondary btn-sm"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                            >
+                                <ExternalLinkIcon size={14} /> Buka Google Drive
+                            </a>
+                            <div style={{ position: 'relative', width: '220px' }}>
                                 <input
                                     type="text"
                                     className="form-input"
@@ -709,58 +797,58 @@ export function Tasks() {
                                 <tbody>
                                     {allTasks
                                         .filter((t) => {
-                                            const q = searchAllTasks.toLowerCase().trim();
-                                            if (!q) return true;
-                                            return (
-                                                (t.student_name && t.student_name.toLowerCase().includes(q)) ||
-                                                (t.task_title && t.task_title.toLowerCase().includes(q)) ||
-                                                (t.description && t.description.toLowerCase().includes(q)) ||
-                                                (t.file_name && t.file_name.toLowerCase().includes(q))
-                                            );
-                                        })
-                                        .map((t, index) => (
-                                        <tr key={t.id}>
-                                            <td>{index + 1}</td>
-                                            <td style={{ fontWeight: 600 }}>{t.student_name}</td>
-                                            <td style={{ fontWeight: 600 }}>{t.task_title || 'Tugas Statistika'}</td>
-                                            <td style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)' }}>
-                                                {t.description || '-'}
-                                            </td>
-                                            <td>{t.file_name}</td>
-                                            <td style={{ color: 'var(--color-text-secondary)' }}>
-                                                {formatBytes(t.file_size)}
-                                            </td>
-                                            <td>{t.submitted_date}</td>
-                                            <td>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                    {t.file_path && (
-                                                        <a
-                                                            href={`${API_URL}${t.file_path}`}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            style={{ fontSize: '0.75rem', color: 'var(--color-primary)', textDecoration: 'underline' }}
-                                                            download
-                                                        >
-                                                            Unduh
-                                                        </a>
-                                                    )}
-                                                    {t.google_drive_link && (
-                                                        <a
-                                                            href={t.google_drive_link}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            style={{ fontSize: '0.75rem', color: 'var(--color-primary)', textDecoration: 'underline' }}
-                                                        >
-                                                            Drive
-                                                        </a>
-                                                    )}
-                                                    {!t.file_path && !t.google_drive_link && (
-                                                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Lokal</span>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                             const q = searchAllTasks.toLowerCase().trim();
+                                             if (!q) return true;
+                                             return (
+                                                 (t.student_name && t.student_name.toLowerCase().includes(q)) ||
+                                                 (t.task_title && t.task_title.toLowerCase().includes(q)) ||
+                                                 (t.description && t.description.toLowerCase().includes(q)) ||
+                                                 (t.file_name && t.file_name.toLowerCase().includes(q))
+                                             );
+                                         })
+                                         .map((t, index) => (
+                                         <tr key={t.id}>
+                                             <td>{index + 1}</td>
+                                             <td style={{ fontWeight: 600 }}>{t.student_name}</td>
+                                             <td style={{ fontWeight: 600 }}>{t.task_title || 'Tugas Statistika'}</td>
+                                             <td style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)' }}>
+                                                 {t.description || '-'}
+                                             </td>
+                                             <td>{t.file_name}</td>
+                                             <td style={{ color: 'var(--color-text-secondary)' }}>
+                                                 {formatBytes(t.file_size)}
+                                             </td>
+                                             <td>{t.submitted_date}</td>
+                                             <td>
+                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                                     {t.file_path && (
+                                                         <a
+                                                             href={`${API_URL}${t.file_path}`}
+                                                             target="_blank"
+                                                             rel="noopener noreferrer"
+                                                             style={{ fontSize: '0.75rem', color: 'var(--color-primary)', textDecoration: 'underline' }}
+                                                             download
+                                                         >
+                                                             Unduh
+                                                         </a>
+                                                     )}
+                                                     {t.google_drive_link && (
+                                                         <a
+                                                             href={t.google_drive_link}
+                                                             target="_blank"
+                                                             rel="noopener noreferrer"
+                                                             style={{ fontSize: '0.75rem', color: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '3px', textDecoration: 'underline' }}
+                                                         >
+                                                             <ExternalLinkIcon size={12} /> Drive
+                                                         </a>
+                                                     )}
+                                                     {!t.file_path && !t.google_drive_link && (
+                                                         <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Lokal</span>
+                                                     )}
+                                                 </div>
+                                             </td>
+                                         </tr>
+                                     ))}
                                 </tbody>
                             </table>
                         </div>
@@ -994,9 +1082,9 @@ export function Tasks() {
                                                                             href={st.google_drive_link}
                                                                             target="_blank"
                                                                             rel="noopener noreferrer"
-                                                                            style={{ fontSize: '0.75rem', color: 'var(--color-primary)', textDecoration: 'underline' }}
+                                                                            style={{ fontSize: '0.75rem', color: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '3px', textDecoration: 'underline' }}
                                                                         >
-                                                                            Drive
+                                                                            <ExternalLinkIcon size={12} /> Drive
                                                                         </a>
                                                                     )}
                                                                 </div>

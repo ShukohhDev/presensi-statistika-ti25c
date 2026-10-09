@@ -4,28 +4,53 @@ const { getDb } = require('../config/database');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const { uploadTask } = require('../middleware/upload');
 
-const { uploadToDrive } = require('../services/google-drive');
+const { uploadToDrive, DEFAULT_FOLDER_URL } = require('../services/google-drive');
 
 // POST /api/tasks/upload - Upload tugas
 router.post('/upload', authenticateToken, uploadTask.single('file'), async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ error: 'File wajib diupload.' });
+        const { task_title, description, submitted_date, assignment_id, drive_link } = req.body;
+
+        if (!req.file && (!drive_link || !drive_link.trim())) {
+            return res.status(400).json({ error: 'Harap pilih file tugas atau masukkan tautan Google Drive.' });
         }
 
-        const { task_title, description, submitted_date, assignment_id } = req.body;
         if (!submitted_date) {
             return res.status(400).json({ error: 'Tanggal pengumpulan wajib diisi.' });
         }
 
-        const driveResult = await uploadToDrive(
-            req.file.path,
-            `${req.user.name}_${req.file.originalname}`,
-            req.file.mimetype
-        );
+        let googleDriveId = null;
+        let googleDriveLink = (drive_link && drive_link.trim()) ? drive_link.trim() : null;
+        let localPath = null;
+        let fileName = 'Tautan Google Drive';
+        let fileType = 'application/octet-stream';
+        let fileSize = 0;
+
+        if (req.file) {
+            fileName = req.file.originalname;
+            fileType = req.file.mimetype;
+            fileSize = req.file.size;
+            localPath = `/uploads/tasks/${req.file.filename}`;
+
+            const driveResult = await uploadToDrive(
+                req.file.path,
+                `${req.user.name}_${req.file.originalname}`,
+                req.file.mimetype
+            );
+
+            if (driveResult.googleDriveId) {
+                googleDriveId = driveResult.googleDriveId;
+            }
+            if (driveResult.googleDriveLink) {
+                googleDriveLink = driveResult.googleDriveLink;
+            } else if (!googleDriveLink) {
+                googleDriveLink = DEFAULT_FOLDER_URL;
+            }
+        } else if (!googleDriveLink) {
+            googleDriveLink = DEFAULT_FOLDER_URL;
+        }
 
         const db = getDb();
-        const localPath = `/uploads/tasks/${req.file.filename}`;
 
         db.prepare(
             `INSERT INTO tasks (user_id, assignment_id, task_title, description, file_name, file_path, file_type, file_size, google_drive_id, google_drive_link, submitted_date) 
@@ -35,27 +60,27 @@ router.post('/upload', authenticateToken, uploadTask.single('file'), async (req,
             assignment_id ? parseInt(assignment_id, 10) : null,
             task_title || 'Tugas Statistika',
             description || null,
-            req.file.originalname,
+            fileName,
             localPath,
-            req.file.mimetype,
-            req.file.size,
-            driveResult.googleDriveId,
-            driveResult.googleDriveLink,
+            fileType,
+            fileSize,
+            googleDriveId,
+            googleDriveLink,
             submitted_date
         );
 
         // Log aktivitas
         db.prepare(
             'INSERT INTO activity_log (user_id, action, description) VALUES (?, ?, ?)'
-        ).run(req.user.id, 'upload_tugas', `Mengupload tugas: ${req.file.originalname}`);
+        ).run(req.user.id, 'upload_tugas', `Mengumpulkan tugas: ${fileName}`);
 
         res.json({
-            message: 'Tugas berhasil diupload.',
+            message: 'Tugas berhasil dikumpulkan.',
             file: {
-                name: req.file.originalname,
-                size: req.file.size,
-                type: req.file.mimetype,
-                driveLink: driveResult.googleDriveLink
+                name: fileName,
+                size: fileSize,
+                type: fileType,
+                driveLink: googleDriveLink
             }
         });
     } catch (err) {
