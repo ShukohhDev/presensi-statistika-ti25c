@@ -1,7 +1,4 @@
-FROM node:20-alpine
-
-# Install build tools untuk native binding better-sqlite3
-RUN apk add --no-cache python3 make g++
+FROM node:20-slim
 
 WORKDIR /app
 
