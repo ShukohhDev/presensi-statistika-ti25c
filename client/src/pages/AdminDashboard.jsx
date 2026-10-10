@@ -508,7 +508,7 @@ Shukoh#Dev (PJ MK Statistika Kelas TI25C)`;
 
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
                                     <ClockIcon size={18} />
-                                    <span style={{ fontSize: '1.25rem', fontWeight: 700, color: countdown < 180 ? 'var(--color-danger)' : 'var(--color-primary)' }}>
+                                    <span style={{ fontSize: '1.25rem', fontWeight: 700, fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums', letterSpacing: '0.04em', color: countdown < 180 ? 'var(--color-danger)' : 'var(--color-primary)' }}>
                                         {formatTimer(countdown)}
                                     </span>
                                     <span style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)' }}>

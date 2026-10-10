@@ -264,7 +264,7 @@ export function Reports() {
                         </div>
                     ) : myReports.length === 0 ? (
                         <div className="empty-state">
-                            <MessageSquareIcon size={44} />
+                            <MessageSquareIcon size={32} />
                             <h3>Belum Ada Laporan Terkirim</h3>
                             <p>Laporan atau masukan yang Anda ajukan akan tampil di sini.</p>
                         </div>
@@ -330,7 +330,7 @@ export function Reports() {
                         </div>
                     ) : allReports.length === 0 ? (
                         <div className="empty-state">
-                            <MessageSquareIcon size={44} />
+                            <MessageSquareIcon size={32} />
                             <h3>Tidak Ada Laporan Masuk</h3>
                             <p>Saat ini tidak ada laporan dari mahasiswa.</p>
                         </div>
@@ -351,7 +351,7 @@ export function Reports() {
                                 <tbody>
                                     {allReports.map((r, index) => (
                                         <tr key={r.id}>
-                                            <td>{index + 1}</td>
+                                            <td style={{ fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums', color: 'var(--color-text-muted)' }}>{index + 1}</td>
                                             <td style={{ fontWeight: 600 }}>{r.reporter_name}</td>
                                             <td style={{ textTransform: 'capitalize' }}>{r.category}</td>
                                             <td style={{ maxWidth: '300px' }}>
@@ -394,7 +394,7 @@ export function Reports() {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                                            <td style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
                                                 {formatDateTime(r.created_at)}
                                             </td>
                                             <td style={{ textAlign: 'right' }}>

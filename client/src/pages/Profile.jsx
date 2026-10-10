@@ -361,26 +361,26 @@ export function Profile() {
                                         <span style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)' }}>
                                             Tingkat Kehadiran
                                         </span>
-                                        <span style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-primary)' }}>
+                                        <span style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums' }}>
                                             {summary.percentage}%
                                         </span>
                                     </div>
 
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', textAlign: 'center', marginTop: '12px' }}>
                                         <div style={{ padding: '8px', backgroundColor: 'var(--color-success-light)', borderRadius: 'var(--radius-md)' }}>
-                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-success)' }}>{summary.hadir}</div>
+                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-success)', fontFamily: 'var(--font-mono)' }}>{summary.hadir}</div>
                                             <div style={{ fontSize: '0.688rem', color: 'var(--color-success)' }}>Hadir</div>
                                         </div>
                                         <div style={{ padding: '8px', backgroundColor: 'var(--color-warning-light)', borderRadius: 'var(--radius-md)' }}>
-                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-warning)' }}>{summary.izin}</div>
+                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-warning)', fontFamily: 'var(--font-mono)' }}>{summary.izin}</div>
                                             <div style={{ fontSize: '0.688rem', color: 'var(--color-warning)' }}>Izin</div>
                                         </div>
                                         <div style={{ padding: '8px', backgroundColor: 'var(--color-info-light)', borderRadius: 'var(--radius-md)' }}>
-                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-info)' }}>{summary.sakit}</div>
+                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-info)', fontFamily: 'var(--font-mono)' }}>{summary.sakit}</div>
                                             <div style={{ fontSize: '0.688rem', color: 'var(--color-info)' }}>Sakit</div>
                                         </div>
                                         <div style={{ padding: '8px', backgroundColor: 'var(--color-danger-light)', borderRadius: 'var(--radius-md)' }}>
-                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-danger)' }}>{summary.alpha}</div>
+                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-danger)', fontFamily: 'var(--font-mono)' }}>{summary.alpha}</div>
                                             <div style={{ fontSize: '0.688rem', color: 'var(--color-danger)' }}>Alpha</div>
                                         </div>
                                     </div>

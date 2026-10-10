@@ -584,7 +584,7 @@ export function Tasks() {
                         </div>
                     ) : myTasks.length === 0 ? (
                         <div className="empty-state">
-                            <FileTextIcon size={48} />
+                            <FileTextIcon size={32} />
                             <h3>Belum Ada Tugas Dikumpulkan</h3>
                             <p>Anda belum mengunggah tugas pada semester ini.</p>
                         </div>
@@ -606,16 +606,16 @@ export function Tasks() {
                                 <tbody>
                                     {myTasks.map((t, index) => (
                                         <tr key={t.id}>
-                                            <td>{index + 1}</td>
+                                            <td style={{ fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums', color: 'var(--color-text-muted)' }}>{index + 1}</td>
                                             <td style={{ fontWeight: 600 }}>{t.task_title || 'Tugas Statistika'}</td>
                                             <td style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)' }}>
                                                 {t.description || '-'}
                                             </td>
-                                            <td>{t.file_name}</td>
-                                            <td style={{ color: 'var(--color-text-secondary)' }}>
+                                            <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.813rem' }}>{t.file_name}</td>
+                                            <td style={{ color: 'var(--color-text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.813rem' }}>
                                                 {formatBytes(t.file_size)}
                                             </td>
-                                            <td>{t.submitted_date}</td>
+                                            <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.813rem' }}>{t.submitted_date}</td>
                                             <td>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                     <span className="badge-status badge-hadir">

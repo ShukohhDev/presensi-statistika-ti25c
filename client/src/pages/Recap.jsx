@@ -388,22 +388,22 @@ export function Recap() {
                                 const uas = getUASStatus(item.percentage || 0);
                                 return (
                                     <tr key={item.id}>
-                                        <td>{index + 1}</td>
+                                        <td style={{ fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums', color: 'var(--color-text-muted)' }}>{index + 1}</td>
                                         <td style={{ fontWeight: 600 }}>{item.name}</td>
-                                        <td style={{ textAlign: 'center', color: 'var(--color-status-hadir)', fontWeight: 600 }}>
+                                        <td style={{ textAlign: 'center', color: 'var(--color-status-hadir)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                                             {item.counts.hadir}
                                         </td>
-                                        <td style={{ textAlign: 'center', color: 'var(--color-status-izin)', fontWeight: 600 }}>
+                                        <td style={{ textAlign: 'center', color: 'var(--color-status-izin)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                                             {item.counts.izin}
                                         </td>
-                                        <td style={{ textAlign: 'center', color: 'var(--color-status-sakit)', fontWeight: 600 }}>
+                                        <td style={{ textAlign: 'center', color: 'var(--color-status-sakit)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                                             {item.counts.sakit}
                                         </td>
-                                        <td style={{ textAlign: 'center', color: 'var(--color-status-alpha)', fontWeight: 600 }}>
+                                        <td style={{ textAlign: 'center', color: 'var(--color-status-alpha)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                                             {item.counts.alpha}
                                         </td>
                                         <td style={{ textAlign: 'center' }}>
-                                            <span style={{ fontWeight: 700, fontSize: '0.938rem', color: 'var(--color-accent)' }}>{item.percentage}%</span>
+                                            <span style={{ fontWeight: 700, fontSize: '0.938rem', color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums' }}>{item.percentage}%</span>
                                         </td>
                                         <td style={{ textAlign: 'center' }}>
                                             <span className={`badge-status ${uas.badgeClass}`} style={{ fontSize: '0.75rem', padding: '3px 10px' }}>
@@ -443,7 +443,7 @@ export function Recap() {
                                 const uas = getUASStatus(item.percentage || 0);
                                 return (
                                     <tr key={item.id}>
-                                        <td>{index + 1}</td>
+                                        <td style={{ fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums', color: 'var(--color-text-muted)' }}>{index + 1}</td>
                                         <td style={{ fontWeight: 600 }}>{item.name}</td>
                                         {sessions.length === 0 ? (
                                             <td style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>-</td>
@@ -454,10 +454,10 @@ export function Recap() {
                                                 </td>
                                             ))
                                         )}
-                                        <td style={{ textAlign: 'center', fontWeight: 600 }}>
+                                        <td style={{ textAlign: 'center', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                                             {item.counts.hadir}
                                         </td>
-                                        <td style={{ textAlign: 'center', fontWeight: 700, color: 'var(--color-accent)' }}>
+                                        <td style={{ textAlign: 'center', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums' }}>
                                             {item.percentage}%
                                         </td>
                                         <td style={{ textAlign: 'center' }}>

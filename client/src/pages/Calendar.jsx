@@ -253,8 +253,8 @@ export function Calendar() {
                                     style={{
                                         position: 'relative',
                                         padding: '4px',
-                                        minHeight: '44px',
-                                        ...(isSelected && !today ? { border: '2px solid var(--color-primary)' } : {})
+                                        minHeight: '48px',
+                                        ...(isSelected && !today ? { boxShadow: 'inset 0 0 0 2px var(--color-primary)', backgroundColor: 'var(--color-primary-subtle)' } : {})
                                     }}
                                     onClick={() => handleSelectDay(day)}
                                 >

@@ -309,7 +309,7 @@ Pertanyaan saya: `;
                 </div>
             ) : filteredMaterials.length === 0 ? (
                 <div className="card empty-state" style={{ padding: '48px 16px' }}>
-                    <BookOpenIcon size={48} />
+                    <BookOpenIcon size={32} />
                     <h3>{activeCategory === 'dataset' ? 'Tidak Ada Dataset Praktikum Ditemukan' : 'Tidak Ada Materi Perkuliahan Ditemukan'}</h3>
                     <p>
                         {searchQuery || selectedMeetingFilter !== 'all'
@@ -334,7 +334,7 @@ Pertanyaan saya: `;
                         >
                             <div>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '10px' }}>
-                                    <span className={`badge-status ${m.category === 'dataset' ? 'badge-izin' : 'badge-hadir'}`} style={{ fontSize: '0.75rem', fontWeight: 600 }}>
+                                    <span className={`badge-status ${m.category === 'dataset' ? 'badge-izin' : 'badge-hadir'}`} style={{ fontSize: '0.75rem', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                                         Pertemuan ke-{m.meeting_number} {m.category === 'dataset' ? '- Dataset' : ''}
                                     </span>
                                     {user?.role === 'admin' && (

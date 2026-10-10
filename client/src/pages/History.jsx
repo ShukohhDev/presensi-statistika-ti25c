@@ -129,7 +129,7 @@ export function History() {
                 <div className="card">
                     {attendanceList.length === 0 ? (
                         <div className="empty-state">
-                            <ClockIcon size={44} />
+                            <ClockIcon size={32} />
                             <h3>Belum Ada Riwayat Kehadiran</h3>
                             <p>Data kehadiran akan dicatat saat Anda melakukan presensi perkuliahan.</p>
                         </div>
@@ -149,15 +149,15 @@ export function History() {
                                 <tbody>
                                     {attendanceList.map((item, index) => (
                                         <tr key={item.id}>
-                                            <td>{index + 1}</td>
-                                            <td style={{ fontWeight: 600 }}>P{item.meeting_number}</td>
+                                            <td style={{ fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums', color: 'var(--color-text-muted)' }}>{index + 1}</td>
+                                            <td style={{ fontWeight: 600, fontFamily: 'var(--font-mono)' }}>P{item.meeting_number}</td>
                                             <td>{item.title || `Pertemuan ${item.meeting_number}`}</td>
                                             <td>
                                                 <span className={`badge-status badge-${item.status}`}>
                                                     {item.status === 'hadir' ? 'Masuk (Hadir)' : item.status}
                                                 </span>
                                             </td>
-                                            <td style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)' }}>
+                                            <td style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-mono)' }}>
                                                 {formatDateTime(item.timestamp)}
                                             </td>
                                             <td>
@@ -188,7 +188,7 @@ export function History() {
                 <div className="card">
                     {taskList.length === 0 ? (
                         <div className="empty-state">
-                            <FileTextIcon size={44} />
+                            <FileTextIcon size={32} />
                             <h3>Belum Ada Tugas Dikumpulkan</h3>
                             <p>Tugas yang Anda kumpulkan akan muncul dalam daftar riwayat ini.</p>
                         </div>
@@ -210,15 +210,15 @@ export function History() {
                                 <tbody>
                                     {taskList.map((t, index) => (
                                         <tr key={t.id}>
-                                            <td>{index + 1}</td>
+                                            <td style={{ fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums', color: 'var(--color-text-muted)' }}>{index + 1}</td>
                                             <td style={{ fontWeight: 600 }}>{t.task_title || 'Tugas Statistika'}</td>
                                             <td style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)' }}>
                                                 {t.description || '-'}
                                             </td>
-                                            <td>{t.file_name}</td>
-                                            <td>{formatBytes(t.file_size)}</td>
-                                            <td>{t.submitted_date}</td>
-                                            <td style={{ fontSize: '0.813rem', color: 'var(--color-text-muted)' }}>
+                                            <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.813rem' }}>{t.file_name}</td>
+                                            <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.813rem' }}>{formatBytes(t.file_size)}</td>
+                                            <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.813rem' }}>{t.submitted_date}</td>
+                                            <td style={{ fontSize: '0.813rem', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
                                                 {formatDateTime(t.submitted_at)}
                                             </td>
                                             <td style={{ textAlign: 'center' }}>
@@ -244,7 +244,7 @@ export function History() {
                 <div className="card">
                     {activityList.length === 0 ? (
                         <div className="empty-state">
-                            <HistoryIcon size={44} />
+                            <HistoryIcon size={32} />
                             <h3>Belum Ada Catatan Aktivitas</h3>
                             <p>Setiap tindakan seperti login, presensi, dan upload akan terekam di sini.</p>
                         </div>
@@ -262,8 +262,8 @@ export function History() {
                                 <tbody>
                                     {activityList.map((act, index) => (
                                         <tr key={act.id}>
-                                            <td>{index + 1}</td>
-                                            <td style={{ fontSize: '0.813rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
+                                            <td style={{ fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums', color: 'var(--color-text-muted)' }}>{index + 1}</td>
+                                            <td style={{ fontSize: '0.813rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', fontFamily: 'var(--font-mono)' }}>
                                                 {formatDateTime(act.created_at)}
                                             </td>
                                             <td>
