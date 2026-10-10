@@ -437,8 +437,34 @@ export function Reports() {
 
                     <div className="form-group">
                         <label className="form-label" htmlFor="statusUpdateSelect">
-                            Perbarui Status
+                            Perbarui Status Laporan
                         </label>
+                        <div className="choice-pills">
+                            <button
+                                type="button"
+                                className={`choice-pill ${newStatus === 'baru' ? 'selected' : ''}`}
+                                onClick={() => setNewStatus('baru')}
+                            >
+                                <span className="pill-dot" style={{ backgroundColor: '#3B82F6' }} />
+                                Baru
+                            </button>
+                            <button
+                                type="button"
+                                className={`choice-pill ${newStatus === 'diproses' ? 'selected' : ''}`}
+                                onClick={() => setNewStatus('diproses')}
+                            >
+                                <span className="pill-dot" style={{ backgroundColor: '#F59E0B' }} />
+                                Sedang Diproses
+                            </button>
+                            <button
+                                type="button"
+                                className={`choice-pill ${newStatus === 'selesai' ? 'selected' : ''}`}
+                                onClick={() => setNewStatus('selesai')}
+                            >
+                                <span className="pill-dot" style={{ backgroundColor: '#10B981' }} />
+                                Selesai / Teratasi
+                            </button>
+                        </div>
                         <select
                             id="statusUpdateSelect"
                             className="form-select"

@@ -464,8 +464,42 @@ export function Calendar() {
 
                     <div className="form-group">
                         <label className="form-label" htmlFor="eventTypeSelect">
-                            Kategori Agenda
+                            Pilih Kategori Agenda
                         </label>
+                        <div className="choice-pills">
+                            <button
+                                type="button"
+                                className={`choice-pill ${eventType === 'kuliah' ? 'selected' : ''}`}
+                                onClick={() => setEventType('kuliah')}
+                            >
+                                <span className="pill-dot" style={{ backgroundColor: '#2563EB' }} />
+                                Kuliah Tatap Muka
+                            </button>
+                            <button
+                                type="button"
+                                className={`choice-pill ${eventType === 'ujian' ? 'selected' : ''}`}
+                                onClick={() => setEventType('ujian')}
+                            >
+                                <span className="pill-dot" style={{ backgroundColor: '#DC2626' }} />
+                                Quiz / Ujian
+                            </button>
+                            <button
+                                type="button"
+                                className={`choice-pill ${eventType === 'tugas' ? 'selected' : ''}`}
+                                onClick={() => setEventType('tugas')}
+                            >
+                                <span className="pill-dot" style={{ backgroundColor: '#D97706' }} />
+                                Pengumpulan Tugas
+                            </button>
+                            <button
+                                type="button"
+                                className={`choice-pill ${eventType === 'libur' ? 'selected' : ''}`}
+                                onClick={() => setEventType('libur')}
+                            >
+                                <span className="pill-dot" style={{ backgroundColor: '#16A34A' }} />
+                                Libur Kuliah
+                            </button>
+                        </div>
                         <select
                             id="eventTypeSelect"
                             className="form-select"

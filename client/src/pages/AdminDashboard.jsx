@@ -888,7 +888,41 @@ Shukoh#Dev (PJ MK Statistika Kelas TI25C)`;
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label" htmlFor="statusSelect">Status Baru</label>
+                        <label className="form-label" htmlFor="statusSelect">Pilih Status Baru</label>
+                        <div className="choice-pills">
+                            <button
+                                type="button"
+                                className={`choice-pill ${selectedStatus === 'hadir' ? 'selected' : ''}`}
+                                onClick={() => setSelectedStatus('hadir')}
+                            >
+                                <span className="pill-dot" style={{ backgroundColor: '#10B981' }} />
+                                Hadir (Masuk)
+                            </button>
+                            <button
+                                type="button"
+                                className={`choice-pill ${selectedStatus === 'izin' ? 'selected' : ''}`}
+                                onClick={() => setSelectedStatus('izin')}
+                            >
+                                <span className="pill-dot" style={{ backgroundColor: '#F59E0B' }} />
+                                Izin
+                            </button>
+                            <button
+                                type="button"
+                                className={`choice-pill ${selectedStatus === 'sakit' ? 'selected' : ''}`}
+                                onClick={() => setSelectedStatus('sakit')}
+                            >
+                                <span className="pill-dot" style={{ backgroundColor: '#EF4444' }} />
+                                Sakit
+                            </button>
+                            <button
+                                type="button"
+                                className={`choice-pill ${selectedStatus === 'alpha' ? 'selected' : ''}`}
+                                onClick={() => setSelectedStatus('alpha')}
+                            >
+                                <span className="pill-dot" style={{ backgroundColor: '#6B7280' }} />
+                                Alpha
+                            </button>
+                        </div>
                         <select
                             id="statusSelect"
                             className="form-select"

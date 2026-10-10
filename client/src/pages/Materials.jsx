@@ -462,9 +462,27 @@ Pertanyaan saya: `;
                                 <label className="form-label" htmlFor="matCategorySelect">
                                     Kategori Berkas <span style={{ color: 'var(--color-danger)' }}>*</span>
                                 </label>
+                                <div className="choice-pills">
+                                    <button
+                                        type="button"
+                                        className={`choice-pill ${category === 'slide' ? 'selected' : ''}`}
+                                        onClick={() => setCategory('slide')}
+                                    >
+                                        <span className="pill-dot" style={{ backgroundColor: '#2563EB' }} />
+                                        Slide & Modul Teori
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`choice-pill ${category === 'dataset' ? 'selected' : ''}`}
+                                        onClick={() => setCategory('dataset')}
+                                    >
+                                        <span className="pill-dot" style={{ backgroundColor: '#059669' }} />
+                                        Dataset & Praktikum
+                                    </button>
+                                </div>
                                 <select
                                     id="matCategorySelect"
-                                    className="form-input"
+                                    className="form-select"
                                     value={category}
                                     onChange={(e) => setCategory(e.target.value)}
                                     required
@@ -615,9 +633,27 @@ Pertanyaan saya: `;
                                 <label className="form-label" htmlFor="editMatCategorySelect">
                                     Kategori Berkas <span style={{ color: 'var(--color-danger)' }}>*</span>
                                 </label>
+                                <div className="choice-pills">
+                                    <button
+                                        type="button"
+                                        className={`choice-pill ${editCategory === 'slide' ? 'selected' : ''}`}
+                                        onClick={() => setEditCategory('slide')}
+                                    >
+                                        <span className="pill-dot" style={{ backgroundColor: '#2563EB' }} />
+                                        Slide & Modul Teori
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`choice-pill ${editCategory === 'dataset' ? 'selected' : ''}`}
+                                        onClick={() => setEditCategory('dataset')}
+                                    >
+                                        <span className="pill-dot" style={{ backgroundColor: '#059669' }} />
+                                        Dataset & Praktikum
+                                    </button>
+                                </div>
                                 <select
                                     id="editMatCategorySelect"
-                                    className="form-input"
+                                    className="form-select"
                                     value={editCategory}
                                     onChange={(e) => setEditCategory(e.target.value)}
                                     required

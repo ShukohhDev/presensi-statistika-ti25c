@@ -280,18 +280,38 @@ export function Attendance() {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsPanelOpen(!isPanelOpen); }}
                 >
-                    <div>
-                        <h3>Statistika</h3>
-                        <p style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-                            {activeSession ? (
-                                `Pertemuan ${activeSession.meeting_number}: ${activeSession.title}`
-                            ) : (
-                                'Sesi Perkuliahan Statistika - Kelas TI25C'
-                            )}
-                        </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                        <div style={{
+                            width: '42px',
+                            height: '42px',
+                            borderRadius: '12px',
+                            backgroundColor: 'var(--color-primary-light)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'var(--color-primary)',
+                            flexShrink: 0
+                        }}>
+                            <BookOpenIcon size={22} />
+                        </div>
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                <h3>Statistika</h3>
+                                <span className="badge-status badge-info" style={{ fontSize: '0.688rem', padding: '2px 8px' }}>
+                                    Jendela Presensi
+                                </span>
+                            </div>
+                            <p style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)', marginTop: '2px', margin: 0 }}>
+                                {activeSession ? (
+                                    `Pertemuan ${activeSession.meeting_number}: ${activeSession.title}`
+                                ) : (
+                                    'Sesi Perkuliahan Statistika - Kelas TI25C'
+                                )}
+                            </p>
+                        </div>
                     </div>
                     <div className="arrow-icon">
-                        <ChevronDownIcon size={24} />
+                        <ChevronDownIcon size={20} />
                     </div>
                 </div>
 
@@ -345,53 +365,77 @@ export function Attendance() {
 
                                 <form onSubmit={handleSubmit}>
                                     <label className="form-label" style={{ marginBottom: '12px' }}>
-                                        Pilih Status Kehadiran
+                                        Pilih Status Kehadiran Anda
                                     </label>
 
                                     <div className="attendance-options">
                                         {/* Pilihan Masuk (Hadir) */}
                                         <button
                                             type="button"
-                                            className={`attendance-option ${selectedOption === 'hadir' ? 'selected' : ''}`}
+                                            className={`attendance-option attendance-option-hadir ${selectedOption === 'hadir' ? 'selected' : ''}`}
                                             onClick={() => setSelectedOption('hadir')}
                                         >
-                                            <span className="option-dot" />
-                                            <div>
-                                                <div style={{ fontWeight: 600 }}>Masuk</div>
-                                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
-                                                    Hadir mengikuti perkuliahan
+                                            <div className="option-icon-box">
+                                                <CheckCircleIcon size={24} />
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                                    <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Masuk (Hadir)</span>
+                                                    <span className="badge-status badge-hadir" style={{ fontSize: '0.688rem', padding: '2px 8px' }}>
+                                                        Tatap Muka
+                                                    </span>
+                                                </div>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '3px' }}>
+                                                    Hadir dan mengikuti seluruh sesi perkuliahan aktif
                                                 </div>
                                             </div>
+                                            <span className="option-dot" />
                                         </button>
 
                                         {/* Pilihan Izin */}
                                         <button
                                             type="button"
-                                            className={`attendance-option ${selectedOption === 'izin' ? 'selected' : ''}`}
+                                            className={`attendance-option attendance-option-izin ${selectedOption === 'izin' ? 'selected' : ''}`}
                                             onClick={() => setSelectedOption('izin')}
                                         >
-                                            <span className="option-dot" />
-                                            <div>
-                                                <div style={{ fontWeight: 600 }}>Izin</div>
-                                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
-                                                    Berhalangan hadir dengan keterangan
+                                            <div className="option-icon-box">
+                                                <ClockIcon size={24} />
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                                    <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Izin</span>
+                                                    <span className="badge-status badge-izin" style={{ fontSize: '0.688rem', padding: '2px 8px' }}>
+                                                        Keterangan Tertulis
+                                                    </span>
+                                                </div>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '3px' }}>
+                                                    Berhalangan hadir dengan alasan atau keperluan jelas
                                                 </div>
                                             </div>
+                                            <span className="option-dot" />
                                         </button>
 
                                         {/* Pilihan Sakit */}
                                         <button
                                             type="button"
-                                            className={`attendance-option ${selectedOption === 'sakit' ? 'selected' : ''}`}
+                                            className={`attendance-option attendance-option-sakit ${selectedOption === 'sakit' ? 'selected' : ''}`}
                                             onClick={() => setSelectedOption('sakit')}
                                         >
-                                            <span className="option-dot" />
-                                            <div>
-                                                <div style={{ fontWeight: 600 }}>Sakit</div>
-                                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
-                                                    Kondisi kesehatan tidak memungkinkan
+                                            <div className="option-icon-box">
+                                                <AlertCircleIcon size={24} />
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                                    <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Sakit</span>
+                                                    <span className="badge-status badge-sakit" style={{ fontSize: '0.688rem', padding: '2px 8px' }}>
+                                                        Surat Dokter
+                                                    </span>
+                                                </div>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '3px' }}>
+                                                    Kondisi kesehatan tidak memungkinkan untuk mengikuti kuliah
                                                 </div>
                                             </div>
+                                            <span className="option-dot" />
                                         </button>
                                     </div>
 
