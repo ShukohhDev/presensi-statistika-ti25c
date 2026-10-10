@@ -272,7 +272,7 @@ export function Attendance() {
             </div>
 
             <div className="attendance-panel">
-                {/* Panel Mata Kuliah dengan Panah */}
+                {/* Panel Mata Kuliah Resmi */}
                 <div
                     className={`attendance-subject ${isPanelOpen ? 'expanded' : ''}`}
                     onClick={() => setIsPanelOpen(!isPanelOpen)}
@@ -280,46 +280,62 @@ export function Attendance() {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsPanelOpen(!isPanelOpen); }}
                 >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div style={{
-                            width: '42px',
-                            height: '42px',
-                            borderRadius: '12px',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: 'var(--radius-sm)',
                             backgroundColor: 'var(--color-primary-light)',
+                            border: '1px solid var(--color-border)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             color: 'var(--color-primary)',
                             flexShrink: 0
                         }}>
-                            <BookOpenIcon size={22} />
+                            <BookOpenIcon size={20} />
                         </div>
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                <h3>Statistika</h3>
+                                <h3>Mata Kuliah Statistika</h3>
                                 <span className="badge-status badge-info" style={{ fontSize: '0.688rem', padding: '2px 8px' }}>
-                                    Jendela Presensi
+                                    TI25C
                                 </span>
-                                {activeSession && (
+                                {activeSession ? (
                                     <span style={{
                                         display: 'inline-flex',
                                         alignItems: 'center',
                                         gap: '6px',
                                         padding: '2px 8px',
-                                        borderRadius: '999px',
-                                        backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                                        color: '#10B981',
+                                        borderRadius: 'var(--radius-xs)',
+                                        backgroundColor: 'var(--color-success-light)',
+                                        color: 'var(--color-success)',
+                                        border: '1px solid rgba(22, 163, 74, 0.2)',
                                         fontSize: '0.688rem',
-                                        fontWeight: 700
+                                        fontWeight: 600
                                     }}>
                                         <span style={{
                                             width: '6px',
                                             height: '6px',
                                             borderRadius: '50%',
-                                            backgroundColor: '#10B981',
-                                            boxShadow: '0 0 8px #10B981'
+                                            backgroundColor: 'currentColor'
                                         }} />
                                         Presensi Dibuka
+                                    </span>
+                                ) : (
+                                    <span style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        padding: '2px 8px',
+                                        borderRadius: 'var(--radius-xs)',
+                                        backgroundColor: 'var(--color-bg-card)',
+                                        color: 'var(--color-text-muted)',
+                                        border: '1px solid var(--color-border)',
+                                        fontSize: '0.688rem',
+                                        fontWeight: 500
+                                    }}>
+                                        Sesi Ditutup
                                     </span>
                                 )}
                             </div>
@@ -333,7 +349,7 @@ export function Attendance() {
                         </div>
                     </div>
                     <div className="arrow-icon">
-                        <ChevronDownIcon size={20} />
+                        <ChevronDownIcon size={18} />
                     </div>
                 </div>
 
@@ -398,11 +414,11 @@ export function Attendance() {
                                             onClick={() => setSelectedOption('hadir')}
                                         >
                                             <div className="option-icon-box">
-                                                <CheckCircleIcon size={24} />
+                                                <CheckCircleIcon size={20} />
                                             </div>
                                             <div style={{ flex: 1 }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                                    <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Masuk (Hadir)</span>
+                                                    <span style={{ fontWeight: 700, fontSize: '0.925rem' }}>Masuk (Hadir)</span>
                                                     <span className="badge-status badge-hadir" style={{ fontSize: '0.688rem', padding: '2px 8px' }}>
                                                         Tatap Muka
                                                     </span>
@@ -421,11 +437,11 @@ export function Attendance() {
                                             onClick={() => setSelectedOption('izin')}
                                         >
                                             <div className="option-icon-box">
-                                                <ClockIcon size={24} />
+                                                <ClockIcon size={20} />
                                             </div>
                                             <div style={{ flex: 1 }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                                    <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Izin</span>
+                                                    <span style={{ fontWeight: 700, fontSize: '0.925rem' }}>Izin</span>
                                                     <span className="badge-status badge-izin" style={{ fontSize: '0.688rem', padding: '2px 8px' }}>
                                                         Keterangan Tertulis
                                                     </span>
@@ -444,11 +460,11 @@ export function Attendance() {
                                             onClick={() => setSelectedOption('sakit')}
                                         >
                                             <div className="option-icon-box">
-                                                <AlertCircleIcon size={24} />
+                                                <AlertCircleIcon size={20} />
                                             </div>
                                             <div style={{ flex: 1 }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                                    <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Sakit</span>
+                                                    <span style={{ fontWeight: 700, fontSize: '0.925rem' }}>Sakit</span>
                                                     <span className="badge-status badge-sakit" style={{ fontSize: '0.688rem', padding: '2px 8px' }}>
                                                         Surat Dokter
                                                     </span>
