@@ -77,6 +77,42 @@ function migrate() {
         `).run();
     } catch (e) {}
 
+    // Sinkronisasi data mahasiswa (hapus Rangga Aditama, tambah Nisa Amaliyah Zahira & Ahmad Azhar Ibrahim)
+    try {
+        const bcrypt = require('bcryptjs');
+
+        // 1. Hapus Rangga Aditama jika masih ada
+        const rangga = db.prepare("SELECT id FROM users WHERE name = 'Rangga Aditama'").get();
+        if (rangga) {
+            db.prepare('DELETE FROM user_settings WHERE user_id = ?').run(rangga.id);
+            db.prepare('DELETE FROM attendance WHERE user_id = ?').run(rangga.id);
+            db.prepare('DELETE FROM tasks WHERE user_id = ?').run(rangga.id);
+            db.prepare('DELETE FROM reports WHERE user_id = ?').run(rangga.id);
+            db.prepare('DELETE FROM activity_log WHERE user_id = ?').run(rangga.id);
+            db.prepare('DELETE FROM notifications WHERE user_id = ?').run(rangga.id);
+            db.prepare('DELETE FROM users WHERE id = ?').run(rangga.id);
+            console.log('Akun mahasiswa Rangga Aditama berhasil dihapus dari database.');
+        }
+
+        // 2. Tambah Nisa Amaliyah Zahira dan Ahmad Azhar Ibrahim jika belum ada
+        const newStudents = [
+            { name: 'Nisa Amaliyah Zahira', password: '250511133', role: 'user' },
+            { name: 'Ahmad Azhar Ibrahim', password: '250511108', role: 'user' }
+        ];
+
+        for (const student of newStudents) {
+            const existing = db.prepare('SELECT id FROM users WHERE name = ?').get(student.name);
+            if (!existing) {
+                const hashedPassword = bcrypt.hashSync(student.password, 10);
+                const res = db.prepare('INSERT INTO users (name, password, role) VALUES (?, ?, ?)').run(student.name, hashedPassword, student.role);
+                db.prepare('INSERT OR IGNORE INTO user_settings (user_id, theme, dark_mode, auto_logout_minutes) VALUES (?, ?, ?, ?)').run(res.lastInsertRowid, 'biru-klasik', 0, 30);
+                console.log(`Akun mahasiswa ${student.name} (${student.password}) berhasil ditambahkan ke database.`);
+            }
+        }
+    } catch (err) {
+        console.error('Error saat sinkronisasi data akun mahasiswa:', err);
+    }
+
     console.log('Database migration completed successfully.');
 }
 
