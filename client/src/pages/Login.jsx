@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { UserIcon, LockIcon } from '../components/Common/Icons';
+import { UserIcon, LockIcon, EyeIcon, EyeOffIcon } from '../components/Common/Icons';
 
 export function Login() {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { user, login } = useAuth();
@@ -85,14 +86,42 @@ export function Login() {
                         <div style={{ position: 'relative' }}>
                             <input
                                 id="password"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 className="form-input"
                                 placeholder="Masukkan NIM Anda"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 disabled={loading}
                                 required
+                                style={{ paddingRight: '44px' }}
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '8px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--color-text-secondary)',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: '6px',
+                                    borderRadius: 'var(--radius-sm)',
+                                    transition: 'color 0.2s ease',
+                                    opacity: 0.8
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                                onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.8')}
+                                title={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                                aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                            >
+                                {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+                            </button>
                         </div>
                     </div>
 
