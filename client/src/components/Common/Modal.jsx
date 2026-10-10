@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { XIcon } from './Icons';
 
-export function Modal({ isOpen, onClose, title, children, footer, maxWidth = '500px' }) {
+export function Modal({ isOpen, onClose, title, children, footer, maxWidth = '500px', icon = null }) {
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape' && isOpen) {
@@ -23,14 +23,21 @@ export function Modal({ isOpen, onClose, title, children, footer, maxWidth = '50
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
             <div
                 className="modal"
                 style={{ maxWidth }}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="modal-header">
-                    <h2 className="modal-title">{title}</h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {icon && (
+                            <div className="modal-header-icon">
+                                {icon}
+                            </div>
+                        )}
+                        <h2 className="modal-title">{title}</h2>
+                    </div>
                     <button
                         type="button"
                         className="modal-close"

@@ -929,7 +929,12 @@ export function Tasks() {
                 <div className="modal-backdrop" onClick={() => setShowCreateSlotModal(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '540px' }}>
                         <div className="modal-header">
-                            <h3>Buat Slot Penugasan Baru</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div className="modal-header-icon">
+                                    <PlusIcon size={18} />
+                                </div>
+                                <h3>Buat Slot Penugasan Baru</h3>
+                            </div>
                             <button
                                 type="button"
                                 className="modal-close"
@@ -1024,11 +1029,16 @@ export function Tasks() {
                 <div className="modal-backdrop" onClick={() => setShowSlotStatusModal(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '720px' }}>
                         <div className="modal-header">
-                            <div>
-                                <h3 style={{ margin: 0 }}>Status Pengumpulan: {selectedSlotForStatus.title}</h3>
-                                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
-                                    Batas: {selectedSlotForStatus.due_date} {selectedSlotForStatus.due_time} WIB
-                                </p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div className="modal-header-icon">
+                                    <FileTextIcon size={18} />
+                                </div>
+                                <div>
+                                    <h3 style={{ margin: 0 }}>Status Pengumpulan: {selectedSlotForStatus.title}</h3>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
+                                        Batas: {selectedSlotForStatus.due_date} {selectedSlotForStatus.due_time} WIB
+                                    </p>
+                                </div>
                             </div>
                             <button
                                 type="button"

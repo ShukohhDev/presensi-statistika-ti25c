@@ -300,6 +300,28 @@ export function Attendance() {
                                 <span className="badge-status badge-info" style={{ fontSize: '0.688rem', padding: '2px 8px' }}>
                                     Jendela Presensi
                                 </span>
+                                {activeSession && (
+                                    <span style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        padding: '2px 8px',
+                                        borderRadius: '999px',
+                                        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                                        color: '#10B981',
+                                        fontSize: '0.688rem',
+                                        fontWeight: 700
+                                    }}>
+                                        <span style={{
+                                            width: '6px',
+                                            height: '6px',
+                                            borderRadius: '50%',
+                                            backgroundColor: '#10B981',
+                                            boxShadow: '0 0 8px #10B981'
+                                        }} />
+                                        Presensi Dibuka
+                                    </span>
+                                )}
                             </div>
                             <p style={{ fontSize: '0.813rem', color: 'var(--color-text-secondary)', marginTop: '2px', margin: 0 }}>
                                 {activeSession ? (
@@ -517,7 +539,7 @@ export function Attendance() {
                                         style={{ marginTop: '24px' }}
                                         disabled={submitting || (timeLeft !== null && timeLeft <= 0)}
                                     >
-                                        {submitting ? 'Memproses Presensi...' : 'Selesai'}
+                                        {submitting ? 'Memproses Presensi...' : 'Kirim Presensi Kehadiran'}
                                     </button>
                                 </form>
                             </div>

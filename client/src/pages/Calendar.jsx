@@ -415,6 +415,7 @@ export function Calendar() {
                 isOpen={addModalOpen}
                 onClose={() => setAddModalOpen(false)}
                 title="Tambah Pengingat Agenda / Kelas / Quiz Baru"
+                icon={<CalendarIcon size={18} />}
             >
                 <form onSubmit={handleSaveEvent}>
                     <div className="form-group">

@@ -447,7 +447,12 @@ Pertanyaan saya: `;
                 <div className="modal-backdrop" onClick={() => setShowUploadModal(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '560px' }}>
                         <div className="modal-header">
-                            <h3>Unggah Materi Perkuliahan Baru</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div className="modal-header-icon">
+                                    <UploadIcon size={18} />
+                                </div>
+                                <h3>Unggah Materi Perkuliahan Baru</h3>
+                            </div>
                             <button
                                 type="button"
                                 className="modal-close"
@@ -618,7 +623,12 @@ Pertanyaan saya: `;
                 <div className="modal-backdrop" onClick={() => setShowEditModal(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '560px' }}>
                         <div className="modal-header">
-                            <h3>Edit Materi Perkuliahan</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div className="modal-header-icon">
+                                    <EditIcon size={18} />
+                                </div>
+                                <h3>Edit Materi Perkuliahan</h3>
+                            </div>
                             <button
                                 type="button"
                                 className="modal-close"

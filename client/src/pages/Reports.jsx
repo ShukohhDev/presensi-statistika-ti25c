@@ -421,6 +421,7 @@ export function Reports() {
                 isOpen={respondModalOpen}
                 onClose={() => setRespondModalOpen(false)}
                 title="Tanggapi Laporan Mahasiswa"
+                icon={<MessageSquareIcon size={18} />}
             >
                 <form onSubmit={handleSaveResponse}>
                     <div style={{ marginBottom: '16px', padding: '12px', background: 'var(--color-bg-hover)', borderRadius: 'var(--radius-md)' }}>

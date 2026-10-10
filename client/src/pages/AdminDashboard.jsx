@@ -858,6 +858,7 @@ Shukoh#Dev (PJ MK Statistika Kelas TI25C)`;
                 isOpen={editModalOpen}
                 onClose={() => setEditModalOpen(false)}
                 title="Ubah Status Kehadiran Mahasiswa"
+                icon={<EditIcon size={18} />}
             >
                 <form onSubmit={handleSaveStatus}>
                     <div style={{ marginBottom: '16px', padding: '12px', background: 'var(--color-bg-hover)', borderRadius: 'var(--radius-md)' }}>
@@ -962,6 +963,7 @@ Shukoh#Dev (PJ MK Statistika Kelas TI25C)`;
                 isOpen={previewModalOpen}
                 onClose={() => setPreviewModalOpen(false)}
                 title="Pratinjau Surat Bukti Izin / Sakit"
+                icon={<FileTextIcon size={18} />}
             >
                 <div style={{ textAlign: 'center' }}>
                     <div style={{ marginBottom: '12px', textAlign: 'left', padding: '12px', background: 'var(--color-bg-hover)', borderRadius: 'var(--radius-md)' }}>
@@ -1005,6 +1007,7 @@ Shukoh#Dev (PJ MK Statistika Kelas TI25C)`;
                 isOpen={courseModalOpen}
                 onClose={() => setCourseModalOpen(false)}
                 title="Pengaturan Info Dosen & Jadwal Perkuliahan"
+                icon={<SettingsIcon size={18} />}
             >
                 <form onSubmit={handleSaveCourseInfo}>
                     <div className="form-group">
@@ -1121,6 +1124,7 @@ Shukoh#Dev (PJ MK Statistika Kelas TI25C)`;
                 isOpen={simulatorModalOpen}
                 onClose={() => setSimulatorModalOpen(false)}
                 title="Simulator Kelayakan UAS Mahasiswa (Syarat Minimal 40%)"
+                icon={<CalculatorIcon size={18} />}
             >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {/* Ringkasan Ketentuan */}
